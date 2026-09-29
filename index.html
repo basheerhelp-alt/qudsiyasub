@@ -1,0 +1,2765 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#00170c]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title id="appDocumentTitle">QUDSIYYASUB - Customer Portal</title>
+  <meta name="theme-color" content="#002414" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="QUDSIYYASUB" />
+  <style>
+    html, body { background-color: #00170c !important; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; user-select: none; }
+  </style>
+  <script>
+    const originalWarn = console.warn;
+    console.warn = function(...args) {
+      if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com')) return;
+      originalWarn.apply(console, args);
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+          colors: { 
+            brand: { 
+              emerald: '#006B3C', 
+              dark: '#004828', 
+              night: '#002414', 
+              deepest: '#00170c',
+              fresh: '#00A651', 
+              lime: '#A8E600', 
+              gold: '#F59E0B'
+            } 
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .compact-luxury-card { 
+      background: linear-gradient(135deg, #00381e 0%, #005a33 60%, #002613 100%); 
+      position: relative; overflow: hidden; 
+      box-shadow: 0 10px 25px -5px rgba(0, 40, 20, 0.4);
+    }
+    .compact-luxury-card::before { 
+      content: ''; position: absolute; top: -60%; right: -25%; width: 230px; height: 230px; 
+      background: radial-gradient(circle, rgba(168,230,0,0.3) 0%, transparent 70%); pointer-events: none; 
+    }
+    .service-card { 
+      border-radius: 20px; 
+      box-shadow: 0 6px 20px -3px rgba(0, 48, 24, 0.09); 
+    }
+    .category-bar { border-left: 3px solid #006B3C; }
+    .squircle-icon { width: 44px; height: 44px; border-radius: 14px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .squircle-icon:active { transform: scale(0.90); }
+    .ripple-ring { position: absolute; border: 2px solid rgba(168, 230, 0, 0.45); border-radius: 50%; animation: ripple 2.2s infinite ease-out; }
+    @keyframes ripple { 0% { width: 70px; height: 70px; opacity: 1; } 100% { width: 220px; height: 220px; opacity: 0; } }
+    .hidden-screen { display: none !important; }
+    .anim-ticker { animation: subtlePulse 3s infinite ease-in-out; }
+    @keyframes subtlePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    .marquee-track { display: inline-block; white-space: nowrap; animation: smoothMarquee 16s linear infinite; }
+    .marquee-track:hover { animation-play-state: paused; }
+    @keyframes smoothMarquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+    .opay-tile { transition: all 0.2s ease; }
+    .opay-tile:active { transform: scale(0.96); }
+    .app-screen { animation: screenFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes screenFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    #draggableSupportWrap { touch-action: none; user-select: none; }
+    
+    .scanner-laser {
+      position: absolute; width: 100%; height: 3px; background: #A8E600;
+      box-shadow: 0 0 15px #A8E600; animation: scanAnim 1.4s infinite ease-in-out alternate;
+    }
+    @keyframes scanAnim { 0% { top: 10%; } 100% { top: 90%; } }
+
+    @media print {
+      body * { visibility: hidden; }
+      #printableReceiptArea, #printableReceiptArea *, #printableResultArea, #printableResultArea *, #printableIdSlipArea, #printableIdSlipArea * { visibility: visible; }
+      #printableReceiptArea, #printableResultArea, #printableIdSlipArea { position: fixed; left: 0; top: 0; width: 100%; margin: 0; background: white !important; color: black !important; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="text-slate-800 dark:text-slate-100 antialiased min-h-screen bg-[#DCEEE5] dark:bg-[#00170c] transition-colors duration-300">
+
+  <!-- 0. LIVE INTERNET BANNER -->
+  <div id="netStatusBanner" class="hidden fixed top-0 inset-x-0 z-[100] text-center text-xs font-bold py-1.5 transition-all shadow-md"></div>
+
+  <!-- UNIVERSAL DRAGGABLE CUSTOMER CARE -->
+  <div id="draggableSupportWrap" class="fixed bottom-6 right-4 z-[9990] flex flex-col items-end cursor-grab active:cursor-grabbing">
+    <div id="supportSpeedDial" class="hidden mb-3 space-y-2 text-right transition-all">
+      <a href="https://wa.me/2348000000000" target="_blank" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-600 text-white text-xs font-bold shadow-xl active:scale-95 transition">
+        <span>WhatsApp Chat</span><div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><i data-lucide="message-circle" class="w-3.5 h-3.5 text-white"></i></div>
+      </a>
+      <a href="tel:+2348000000000" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-slate-900 text-white text-xs font-bold shadow-xl hover:bg-slate-800 active:scale-95 transition">
+        <span>Call Help Desk</span><div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center"><i data-lucide="phone-call" class="w-3.5 h-3.5 text-white"></i></div>
+      </a>
+    </div>
+    <div id="supportMainButton" onclick="toggleSpeedDial()" class="relative group p-3.5 rounded-full bg-gradient-to-tr from-[#004828] to-[#00A651] text-white shadow-2xl border-2 border-[#A8E600] active:scale-95 transition-transform flex items-center justify-center">
+      <span class="absolute inset-0 rounded-full bg-[#A8E600]/30 animate-ping pointer-events-none"></span>
+      <span class="absolute top-0 right-0 w-3.5 h-3.5 bg-[#A8E600] border-2 border-white rounded-full"></span>
+      <i id="supportIcon" data-lucide="headset" class="w-5 h-5 text-white drop-shadow"></i>
+    </div>
+  </div>
+
+  <!-- 1. SPLASH SCREEN -->
+  <div id="screen-splash" class="fixed inset-0 z-[9999] flex flex-col justify-between items-center text-center p-8 select-none bg-gradient-to-b from-[#00381e] via-[#002414] to-[#00170c]">
+    <div></div>
+    <div class="flex flex-col items-center relative">
+      <div class="relative flex items-center justify-center w-36 h-36 mb-6">
+        <div class="ripple-ring" style="animation-delay: 0s;"></div>
+        <div class="relative z-10 w-24 h-24 p-4 rounded-3xl bg-gradient-to-br from-[#006B3C] to-[#00381e] shadow-2xl flex items-center justify-center border-2 border-[#A8E600]/70 overflow-hidden">
+          <span class="text-4xl font-black text-white tracking-wider">Q</span>
+        </div>
+      </div>
+      <h1 class="text-3xl font-black text-white tracking-widest uppercase">QUDSIYYASUB</h1>
+      <p class="text-[10px] uppercase tracking-[0.3em] text-[#A8E600] font-black mt-2">Simple • Fast • Reliable VTU Solutions</p>
+      
+      <div class="w-52 h-2 bg-black/60 rounded-full mt-7 overflow-hidden p-0.5 border border-emerald-700/50">
+        <div id="splashProgress" class="h-full bg-gradient-to-r from-[#00A651] via-[#A8E600] to-emerald-300 rounded-full w-0 transition-all duration-100"></div>
+      </div>
+      <div id="splashPercent" class="text-[11px] font-bold text-emerald-200/90 mt-2 font-mono">Connecting to API Servers... 0%</div>
+    </div>
+    <div class="text-[10px] text-emerald-300/60 tracking-wider flex items-center gap-1.5">
+      <span>🔒 256-Bit SSL Encryption</span> • <span>Bank-Grade Network Shield</span>
+    </div>
+  </div>
+
+  <!-- SCREEN: ONBOARDING -->
+  <div id="screen-onboard" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col justify-between p-6 bg-gradient-to-b from-[#00381e] via-[#002414] to-[#00170c] text-white app-screen">
+    <div class="flex justify-end pt-2">
+      <button onclick="skipOnboarding()" class="text-xs font-bold text-[#A8E600] tracking-wider px-3 py-1 rounded-full bg-white/10 active:scale-95">SKIP</button>
+    </div>
+    <div class="flex flex-col items-center text-center my-auto">
+      <div class="w-24 h-24 rounded-3xl bg-gradient-to-tr from-[#006B3C] to-[#00A651] border-2 border-[#A8E600] flex items-center justify-center shadow-2xl mb-6">
+        <i data-lucide="zap" class="w-12 h-12 text-[#A8E600]"></i>
+      </div>
+      <h2 class="text-2xl font-black tracking-tight">Automated VTU Portal</h2>
+      <p class="text-xs text-emerald-200/80 mt-2 max-w-xs leading-relaxed">
+        Buy Cheap Data, Airtime, Utility Tokens, Convert Airtime to Cash & Print Identity Cards Instantly with Bank-Grade Security.
+      </p>
+    </div>
+    <div class="space-y-3 pb-6">
+      <button onclick="goToSignIn()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#A8E600] to-[#00A651] text-emerald-950 font-black text-xs uppercase tracking-wider shadow-xl active:scale-95 transition">
+        Sign In to Account
+      </button>
+      <button onclick="goToSignUp()" class="w-full py-3.5 rounded-2xl bg-white/10 border border-white/20 text-white font-black text-xs uppercase tracking-wider active:scale-95 transition">
+        Create New Account
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN: SIGN IN -->
+  <div id="screen-signin" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col justify-center p-6 bg-[#DCEEE5] dark:bg-[#00170c] app-screen">
+    <div class="bg-white dark:bg-[#0A3321] rounded-[28px] p-6 shadow-2xl border border-emerald-900/10 space-y-4">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 rounded-2xl bg-[#006B3C] text-white font-black text-xl flex items-center justify-center mx-auto border-2 border-[#A8E600] shadow-md">Q</div>
+        <h2 class="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider pt-2">Welcome Back</h2>
+        <p class="text-xs text-slate-500">Sign in to manage your VTU wallet</p>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Phone Number</label>
+          <div class="relative mt-1">
+            <input type="tel" id="loginPhoneInput" maxlength="11" placeholder="08012345678" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
+          <div class="relative mt-1">
+            <input type="password" id="loginPasswordInput" placeholder="••••••••" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+            <button type="button" onclick="togglePassVisibility('loginPasswordInput')" class="absolute right-3 top-3 text-slate-400">
+              <i data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between text-xs">
+          <label class="flex items-center gap-2 cursor-pointer font-bold text-slate-600 dark:text-slate-300">
+            <input type="checkbox" id="rememberMeCheck" checked class="accent-[#006B3C] w-4 h-4 rounded" />
+            <span>Remember Me</span>
+          </label>
+          <button onclick="showAppScreen('screen-forgot')" class="text-xs font-bold text-[#006B3C] dark:text-[#A8E600] hover:underline">Forgot Password?</button>
+        </div>
+
+        <button onclick="loginUser()" class="w-full py-3.5 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
+          Sign In
+        </button>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-200 dark:border-emerald-800"></div>
+          <span class="flex-shrink mx-2 text-[10px] text-slate-400 uppercase font-black">OR FAST ACCESS</span>
+          <div class="flex-grow border-t border-slate-200 dark:border-emerald-800"></div>
+        </div>
+
+        <button onclick="triggerBiometricLogin()" class="w-full py-3 rounded-xl bg-slate-100 dark:bg-[#00170c] text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition border border-emerald-600/30 shadow-sm">
+          <i data-lucide="fingerprint" class="w-4 h-4 text-[#006B3C] dark:text-[#A8E600]"></i>
+          <span>Sign In with Biometrics</span>
+        </button>
+      </div>
+
+      <div class="text-center pt-2 text-xs font-bold text-slate-500">
+        Don't have an account? <button onclick="goToSignUp()" class="text-[#006B3C] dark:text-[#A8E600] font-extrabold hover:underline">Sign Up</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: SIGN UP -->
+  <div id="screen-signup" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col justify-center p-6 bg-[#DCEEE5] dark:bg-[#00170c] app-screen">
+    <div class="bg-white dark:bg-[#0A3321] rounded-[28px] p-6 shadow-2xl border border-emerald-900/10 space-y-3.5">
+      <div class="text-center space-y-0.5">
+        <h2 class="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Create Account</h2>
+        <p class="text-xs text-slate-500">Join QUDSIYYASUB for instant VTU</p>
+      </div>
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Full Legal Name</label>
+          <input type="text" id="regFullName" placeholder="e.g. Jamilu Abubakar" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Phone Number</label>
+          <input type="tel" id="regPhone" maxlength="11" placeholder="08012345678" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Set 4-Digit Security PIN</label>
+          <input type="password" id="regPinInput" maxlength="4" placeholder="••••" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white text-center tracking-[0.5em] outline-none focus:border-[#006B3C]" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Password</label>
+          <input type="password" id="regPasswordInput" oninput="validatePasswordStrength(this.value)" placeholder="At least 8 chars" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase">Confirm Password</label>
+          <input type="password" id="regConfirmPasswordInput" oninput="checkPasswordMatch()" placeholder="Re-enter password" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold text-slate-900 dark:text-white outline-none focus:border-[#006B3C]" />
+          <div id="matchIndicator" class="hidden text-[10px] font-bold mt-1"></div>
+        </div>
+
+        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-[#00170c] border border-slate-100 text-[9.5px] space-y-1">
+          <div id="rule-len" class="text-slate-400 font-bold flex items-center gap-1.5"><span>✕</span> Min 8 Characters</div>
+          <div id="rule-upper" class="text-slate-400 font-bold flex items-center gap-1.5"><span>✕</span> At least 1 Uppercase</div>
+          <div id="rule-lower" class="text-slate-400 font-bold flex items-center gap-1.5"><span>✕</span> At least 1 Lowercase</div>
+          <div id="rule-num" class="text-slate-400 font-bold flex items-center gap-1.5"><span>✕</span> At least 1 Number</div>
+          <div id="rule-sym" class="text-slate-400 font-bold flex items-center gap-1.5"><span>✕</span> At least 1 Special Symbol</div>
+        </div>
+
+        <button onclick="handleRegistrationSubmit()" class="w-full py-3.5 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">
+          Register Account
+        </button>
+      </div>
+
+      <div class="text-center pt-1 text-xs font-bold text-slate-500">
+        Already registered? <button onclick="goToSignIn()" class="text-[#006B3C] dark:text-[#A8E600] font-extrabold hover:underline">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN: FORGOT PASSWORD -->
+  <div id="screen-forgot" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col justify-center p-6 bg-[#DCEEE5] dark:bg-[#00170c] app-screen">
+    <div class="bg-white dark:bg-[#0A3321] rounded-[28px] p-6 shadow-2xl border border-emerald-900/10 space-y-4">
+      <div class="text-center space-y-1">
+        <h2 class="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Account Recovery</h2>
+        <p class="text-xs text-slate-500">Enter your registered phone to receive OTP</p>
+      </div>
+      <div>
+        <label class="text-[10px] font-bold text-slate-500 uppercase">Phone Number</label>
+        <input type="tel" id="forgotPhoneInput" maxlength="11" placeholder="08012345678" class="w-full mt-1 p-3 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold outline-none" />
+      </div>
+      <button onclick="submitForgotPassword()" class="w-full py-3.5 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs uppercase shadow-lg active:scale-95 transition">
+        Send Recovery Code
+      </button>
+      <button onclick="goToSignIn()" class="w-full text-xs font-bold text-slate-400 hover:text-slate-600 text-center">
+        ← Back to Sign In
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN: OTP VERIFICATION -->
+  <div id="screen-otp" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col justify-center p-6 bg-[#DCEEE5] dark:bg-[#00170c] app-screen">
+    <div class="bg-white dark:bg-[#0A3321] rounded-[28px] p-6 shadow-2xl border border-emerald-900/10 space-y-4 text-center">
+      <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950 text-[#006B3C] mx-auto flex items-center justify-center">
+        <i data-lucide="shield-check" class="w-6 h-6"></i>
+      </div>
+      <div class="space-y-1">
+        <h2 class="text-lg font-black uppercase tracking-wider">Verify Phone Number</h2>
+        <p class="text-xs text-slate-500">We sent a 6-digit verification code to <b id="otpTargetPhone" class="text-slate-900 dark:text-white">0801***</b></p>
+      </div>
+      <input type="tel" id="otpCodeInput" maxlength="6" placeholder="123456" class="w-full p-3 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-center text-2xl font-black tracking-[0.4em] outline-none" />
+      <button onclick="verifyOtpAndProceed()" class="w-full py-3.5 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs uppercase shadow-lg active:scale-95 transition">
+        Verify & Access Account
+      </button>
+      <div class="text-[11px] text-slate-400 font-bold">
+        Didn't receive code? <button onclick="showToast('New code sent successfully!')" class="text-[#006B3C] font-extrabold underline">Resend OTP</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN DASHBOARD (CUSTOMER HUB) -->
+  <div id="screen-dashboard" class="hidden-screen max-w-md mx-auto min-h-screen flex flex-col relative bg-[#DCEEE5] dark:bg-[#00170c] app-screen pb-12">
+    <div class="flex-1 flex flex-col">
+      <!-- Top App Bar -->
+      <header class="sticky top-0 z-40 bg-[#DCEEE5]/95 dark:bg-[#00170c]/95 backdrop-blur-md border-b border-emerald-900/15 px-4 pt-3 pb-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <button onclick="toggleDrawer()" class="p-2 rounded-xl bg-white dark:bg-[#0A3321] border border-emerald-900/15 shadow-sm active:scale-95">
+            <i data-lucide="menu" class="w-5 h-5 text-[#006B3C] dark:text-[#A8E600]"></i>
+          </button>
+          
+          <div class="flex-1 text-center overflow-hidden px-1">
+            <div class="anim-ticker px-3 py-1 rounded-full bg-white dark:bg-[#0A3321] border border-emerald-600/30 shadow-sm inline-flex items-center gap-1.5 max-w-[210px] truncate">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <div id="dynamicTicker" class="text-[11px] font-extrabold truncate text-slate-800 dark:text-white">Welcome, Jamilu Abubakar 👋</div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <div onclick="openProfileModal()" class="relative cursor-pointer active:scale-95 transition" title="Profile Photo">
+              <div id="headerUserAvatar" class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#006B3C] to-[#00381e] border-2 border-[#A8E600] flex items-center justify-center text-white text-xs font-extrabold shadow-sm overflow-hidden customer-personal-avatar">
+                <span class="customer-avatar-initials">JA</span>
+              </div>
+              <span class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-black rounded-full"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- REAL LIVE DATES -->
+        <div class="mt-2 py-1.5 px-3 rounded-lg bg-emerald-950/10 dark:bg-emerald-950/60 border border-emerald-800/20 flex items-center justify-center gap-3 text-[10.5px] font-extrabold">
+          <span class="flex items-center gap-1 text-emerald-800 dark:text-[#A8E600]"><i data-lucide="calendar" class="w-3.5 h-3.5"></i><span id="liveGregorianHeader">Loading date...</span></span>
+          <span class="text-slate-400">•</span>
+          <span class="flex items-center gap-1 text-amber-700 dark:text-amber-400"><i data-lucide="moon" class="w-3.5 h-3.5"></i><span id="liveHijriHeader">Loading Hijri...</span></span>
+        </div>
+      </header>
+
+      <main class="px-4 pt-3 space-y-3 flex-1">
+        <!-- 1. Wallet Card -->
+        <div class="compact-luxury-card rounded-[22px] p-4 text-white relative">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-[10px] uppercase text-emerald-200 font-bold">
+              <span>Wallet Balance</span>
+              <button onclick="toggleBalance()"><i id="eyeIcon" data-lucide="eye" class="w-3.5 h-3.5"></i></button>
+            </div>
+            <span class="px-2 py-0.5 rounded-full bg-[#A8E600]/25 text-[#A8E600] text-[9px] font-black border border-[#A8E600]/40">
+              <span id="headerKycBadge">KYC LEVEL 2 VERIFIED ✓</span>
+            </span>
+          </div>
+          <div class="mt-1 flex items-center justify-between">
+            <div id="balanceDisplay" class="text-2xl font-black tracking-tight">₦50,000.00</div>
+            <button onclick="openFundWalletModal()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#A8E600] to-emerald-400 text-emerald-950 text-xs font-black shadow-lg active:scale-95 transition flex items-center gap-1">
+              <i data-lucide="plus" class="w-3.5 h-3.5 stroke-[3]"></i> Fund Wallet
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Virtual Account Card -->
+        <div class="bg-white dark:bg-[#0A3321] rounded-[20px] p-3.5 border border-emerald-900/15 shadow-sm">
+          <div class="flex items-center justify-between mb-1.5 text-[10px] font-bold">
+            <span class="flex items-center gap-1 text-slate-700 dark:text-slate-300"><i data-lucide="landmark" class="w-3.5 h-3.5 text-[#006B3C] dark:text-[#A8E600]"></i> Dedicated Instant Account</span>
+            <div class="flex items-center gap-1 text-[9px]">
+              <button onclick="switchBank('opay')" id="btn-opay" class="px-2 py-0.5 rounded-md bg-[#006B3C] text-white">OPay</button>
+              <button onclick="switchBank('moniepoint')" id="btn-moniepoint" class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-emerald-950 text-slate-600 dark:text-slate-300">Moniepoint</button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded-xl bg-[#DCEEE5] dark:bg-[#00170c] border border-emerald-600/25">
+            <div>
+              <div class="flex items-center gap-2">
+                <span id="accNumber" class="text-sm font-black text-slate-900 dark:text-white">9012345678</span>
+                <span id="accBankName" class="text-[9px] bg-emerald-100 text-emerald-800 font-extrabold px-1.5 py-0.5 rounded">OPAY</span>
+              </div>
+              <div class="text-[9px] text-slate-500 font-bold uppercase">QUDSIYYASUB / <span class="customer-full-name-display">JAMILU ABUBAKAR</span></div>
+            </div>
+            <button onclick="copyToClipboard(document.getElementById('accNumber').innerText, 'Account Number')" class="px-2.5 py-1.5 rounded-lg bg-[#006B3C] text-white text-[10px] font-bold flex items-center gap-1 active:scale-90 shadow-sm">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> COPY
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Notice Marquee Ticker -->
+        <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs overflow-hidden shadow-sm">
+          <span class="flex-shrink-0 font-bold text-amber-800 bg-amber-200/70 px-1.5 py-0.5 rounded text-[9px] z-10">
+            <i data-lucide="megaphone" class="w-3 h-3 inline mr-0.5"></i> ALERT
+          </span>
+          <div class="overflow-hidden flex-1 relative w-full text-[10.5px] font-semibold text-amber-950 dark:text-amber-200">
+            <span class="marquee-track">⚡ MTN, Airtel, Glo, 9mobile, LABARA & VITAL Automated • NIMC Verified Slips & Result Checker Active ✓</span>
+          </div>
+        </div>
+
+        <!-- HUB 1: TELECOM -->
+        <section class="service-card bg-white dark:bg-[#0A3321] p-3.5 border border-emerald-900/10 dark:border-emerald-800/40">
+          <div class="category-bar pl-2 mb-2.5 flex items-center justify-between">
+            <h3 class="text-[11px] font-extrabold uppercase text-slate-900 dark:text-white">1. Telecom & Internet Hub</h3>
+            <span class="text-[8px] text-emerald-700 dark:text-[#A8E600] font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full">6 Networks Active</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="openAppService('data')" class="relative flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <span class="absolute -top-1 -right-0.5 bg-rose-600 text-white text-[7px] font-black px-1 rounded-full shadow">HOT 🔥</span>
+              <div class="squircle-icon bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-600/20 text-[#006B3C] dark:text-[#A8E600] flex items-center justify-center shadow-sm"><i data-lucide="wifi" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Data Hub</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('airtime')" class="relative flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <span class="absolute -top-1 -right-0.5 bg-amber-500 text-slate-950 text-[7px] font-black px-1 rounded-full shadow">2% OFF</span>
+              <div class="squircle-icon bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-600/20 text-emerald-700 dark:text-[#A8E600] flex items-center justify-center shadow-sm"><i data-lucide="phone-call" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Airtime VTU</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('broadband')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-600/20 text-teal-700 dark:text-teal-400 flex items-center justify-center shadow-sm"><i data-lucide="router" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Broadband</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('a2c')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-amber-50 dark:bg-amber-950/40 border border-amber-600/20 text-amber-600 flex items-center justify-center shadow-sm"><i data-lucide="arrow-left-right" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Airtime 2 Cash</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+          </div>
+        </section>
+
+        <!-- HUB 2: FINANCIAL & BILLS -->
+        <section class="service-card bg-white dark:bg-[#0A3321] p-3.5 border border-emerald-900/10 dark:border-emerald-800/40">
+          <div class="category-bar pl-2 mb-2.5 flex items-center justify-between">
+            <h3 class="text-[11px] font-extrabold uppercase text-slate-900 dark:text-white">2. Financial & Utility Hub</h3>
+            <span class="text-[8px] text-amber-700 dark:text-amber-400 font-bold bg-amber-50 dark:bg-amber-950 px-2 py-0.5 rounded-full">Instant ⚡</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="openAppService('transfer')" class="relative flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <span class="absolute -top-1 -right-0.5 bg-blue-600 text-white text-[7px] font-black px-1 rounded-full shadow">FAST ⚡</span>
+              <div class="squircle-icon bg-emerald-50 border text-[#006B3C] dark:text-[#A8E600] flex items-center justify-center shadow-sm"><i data-lucide="send" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Transfer</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('betting')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-rose-50 dark:bg-rose-950/40 border border-rose-600/20 text-rose-700 flex items-center justify-center shadow-sm"><i data-lucide="trophy" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Betting Hub</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('electricity')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-amber-50 dark:bg-amber-950/40 border border-amber-600/20 text-amber-600 flex items-center justify-center shadow-sm"><i data-lucide="zap" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Electricity</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('cable')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-amber-50 dark:bg-amber-950/40 border border-amber-600/20 text-amber-700 flex items-center justify-center shadow-sm"><i data-lucide="tv" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">Cable TV</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+          </div>
+        </section>
+
+        <!-- HUB 3: IDENTITY SERVICES -->
+        <section class="service-card bg-white dark:bg-[#0A3321] p-3.5 border border-emerald-900/10 dark:border-emerald-800/40">
+          <div class="category-bar pl-2 mb-2.5 flex items-center justify-between">
+            <h3 class="text-[11px] font-extrabold uppercase text-slate-900 dark:text-white">3. Identity Hub (NIN & BVN)</h3>
+            <span class="text-[8px] text-blue-700 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-950 px-2 py-0.5 rounded-full">NIMC Portal</span>
+          </div>
+          <div class="grid grid-cols-4 gap-1.5 text-center">
+            <button onclick="openAppService('nin_slip')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-600/20 text-indigo-700 flex items-center justify-center shadow-sm"><i data-lucide="file-badge-2" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">NIN Slips</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('nin_mod')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-600/20 text-indigo-700 flex items-center justify-center shadow-sm"><i data-lucide="user-cog" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">NIN Modify</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('bvn_slip')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-blue-50 dark:bg-blue-950/40 border border-blue-600/20 text-blue-700 flex items-center justify-center shadow-sm"><i data-lucide="fingerprint" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">BVN Slips</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+            <button onclick="openAppService('bvn_mod')" class="flex flex-col items-center gap-0.5 active:scale-95 transition">
+              <div class="squircle-icon bg-blue-50 dark:bg-blue-950/40 border border-blue-600/20 text-blue-700 flex items-center justify-center shadow-sm"><i data-lucide="shield-alert" class="w-4 h-4"></i></div>
+              <span class="text-[9.5px] font-bold text-slate-700 dark:text-slate-300">BVN Modify</span>
+              <div class="flex items-center gap-1 mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span><span class="h-1 w-1 rounded-full bg-rose-500 opacity-20"></span></div>
+            </button>
+          </div>
+        </section>
+
+        <!-- HUB 4: EDUCATION -->
+        <section class="service-card bg-white dark:bg-[#0A3321] p-3.5 border border-emerald-900/10 dark:border-emerald-800/40">
+          <div class="category-bar pl-2 mb-2.5 flex items-center justify-between">
+            <h3 class="text-[11px] font-extrabold uppercase text-slate-900 dark:text-white">4. Education & Exam Portal</h3>
+            <span class="text-[8px] text-emerald-700 dark:text-[#A8E600] font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full">Automated</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-center">
+            <button onclick="openExamPinModal()" class="p-3 rounded-2xl bg-[#DCEEE5] dark:bg-[#00170c] border border-emerald-600/25 flex items-center gap-3 active:scale-95 transition text-left">
+              <div class="squircle-icon bg-emerald-100 text-[#006B3C] flex items-center justify-center"><i data-lucide="graduation-cap" class="w-5 h-5"></i></div>
+              <div>
+                <b class="text-xs text-slate-900 dark:text-white">Exam PINs & Tokens</b>
+                <div class="text-[9.5px] text-slate-500">WAEC, NECO, NABTEB, JAMB</div>
+                <div class="flex items-center gap-1 mt-1">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span class="text-[8px] text-emerald-700 font-bold">Buy Scratch Card</span>
+                </div>
+              </div>
+            </button>
+            <button onclick="openExamResultModal()" class="p-3 rounded-2xl bg-[#DCEEE5] dark:bg-[#00170c] border border-blue-600/25 flex items-center gap-3 active:scale-95 transition text-left">
+              <div class="squircle-icon bg-blue-100 text-blue-700 flex items-center justify-center"><i data-lucide="file-check" class="w-5 h-5"></i></div>
+              <div>
+                <b class="text-xs text-slate-900 dark:text-white">Check Exam Result</b>
+                <div class="text-[9.5px] text-slate-500">Official Result Slip Portal</div>
+                <div class="flex items-center gap-1 mt-1">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-500 animate-ping"></span>
+                  <span class="text-[8px] text-blue-700 font-bold">Online Statement</span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <!-- RECENT TRANSACTIONS -->
+        <section class="service-card bg-white dark:bg-[#0A3321] p-3.5 border border-emerald-900/10 dark:border-emerald-800/40">
+          <div class="flex items-center justify-between pb-1.5 mb-2 border-b border-slate-100 dark:border-emerald-800/40">
+            <div class="flex items-center gap-1.5">
+              <i data-lucide="history" class="w-3.5 h-3.5 text-[#006B3C] dark:text-[#A8E600]"></i>
+              <h3 class="text-[11px] font-extrabold text-slate-900 dark:text-white uppercase">Recent Transactions</h3>
+            </div>
+            <button onclick="openFullTransactionsModal()" class="text-[10px] font-bold text-[#006B3C] dark:text-[#A8E600] hover:underline flex items-center gap-0.5">
+              See All <i data-lucide="chevron-right" class="w-3 h-3"></i>
+            </button>
+          </div>
+          <div id="recentTxList" class="space-y-1.5"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- MASTER DRAWER MENU -->
+  <div id="masterDrawer" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-start">
+    <div class="w-full max-w-xs bg-white dark:bg-[#072a20] h-full shadow-2xl p-4 flex flex-col justify-between overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-emerald-800">
+          <div class="flex items-center gap-2"><div class="w-8 h-8 rounded-lg bg-[#006B3C] text-white flex items-center justify-center font-extrabold text-sm border border-[#A8E600]">Q</div><span class="text-sm font-black uppercase text-slate-900 dark:text-white">QUDSIYYASUB</span></div>
+          <button onclick="toggleDrawer()"><i data-lucide="x" class="w-5 h-5 text-slate-500"></i></button>
+        </div>
+        <div class="mt-3 space-y-1 text-xs font-bold text-slate-700 dark:text-slate-200">
+          <div onclick="showAppScreen('screen-dashboard'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📊 Dashboard</div>
+          <div onclick="openProfileModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">👤 Profile</div>
+          <div onclick="toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">👛 Wallet</div>
+          <div onclick="toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🏦 Virtual Account</div>
+          <div onclick="openFundWalletModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">💳 Fund Wallet</div>
+          <div onclick="openAppService('data'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📶 Services</div>
+          <div onclick="openAppService('airtime'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📞 Airtime</div>
+          <div onclick="openAppService('data'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🌐 Data</div>
+          <div onclick="openAppService('cable'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📺 Cable TV</div>
+          <div onclick="openAppService('electricity'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">⚡ Electricity</div>
+          <div onclick="openAppService('nin_slip'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🆔 NIN Slips</div>
+          <div onclick="openAppService('nin_mod'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📝 NIN Modification</div>
+          <div onclick="openAppService('bvn_slip'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🔐 BVN Slips</div>
+          <div onclick="openAppService('bvn_mod'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">✏️ BVN Modification</div>
+          <div onclick="openExamPinModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🎓 Exam PINs</div>
+          <div onclick="openAppService('a2c'); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🔄 Airtime to Cash</div>
+          <div onclick="openExamResultModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🖨️ Result Checking</div>
+          <div onclick="openFullTransactionsModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">📜 Transaction History</div>
+          <div onclick="openProfileModal(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">⚙️ Settings</div>
+          <div onclick="toggleSpeedDial(); toggleDrawer();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🎧 Customer Care</div>
+          <div onclick="logoutUser(); toggleDrawer();" class="p-2 rounded-xl text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 cursor-pointer">🚪 Logout</div>
+          <div onclick="toggleThemeMode();" class="p-2 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950 cursor-pointer">🌙 Dark / Light Mode</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THE STANDARDIZED ACCORDION DATA & SERVICE MODAL -->
+  <div id="universalServiceModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[30px] sm:rounded-[26px] p-5 shadow-2xl max-h-[94vh] overflow-y-auto screen-in">
+      <div class="flex items-center justify-between pb-3 border-b">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#006B3C] animate-ping"></span>
+          <h4 id="uModalTitle" class="text-sm font-black text-slate-900 dark:text-white tracking-wide uppercase">SERVICE MODAL</h4>
+        </div>
+        <button onclick="closeModal('universalServiceModal')" class="p-1.5 rounded-full bg-slate-100 dark:bg-emerald-950"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- STEP 1: INPUT & PROVIDER -->
+      <div class="mt-3 rounded-2xl border overflow-hidden shadow-sm" id="uCardStep1">
+        <div onclick="expandFlowStep(1)" class="p-3 bg-slate-50 dark:bg-emerald-950/40 border-b flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-[#006B3C] text-white text-[10px] font-black flex items-center justify-center">1</span>
+            <span id="uStep1TitleText" class="text-xs font-bold uppercase tracking-wider">Recipient & Provider</span>
+          </div>
+          <span id="uStep1SummaryBadge" class="hidden text-[10px] font-extrabold text-[#006B3C] bg-emerald-100 px-2 py-0.5 rounded-md">Edit ✎</span>
+        </div>
+
+        <div id="uStep1Body" class="p-3.5 space-y-3 bg-white dark:bg-[#0A3321]">
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <label id="uInputBoxLabel" class="text-[11px] font-bold text-slate-700 dark:text-slate-300">Recipient Phone Number</label>
+              <span id="liveNetBadge" class="hidden text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">None</span>
+            </div>
+            <div class="relative">
+              <input type="tel" inputmode="numeric" id="uServiceInput" oninput="handleUniversalInput(this.value)" placeholder="Enter 11-digit phone number..." maxlength="11" class="w-full bg-slate-50 dark:bg-[#00170c] border rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white font-black tracking-wider focus:outline-none pr-9" />
+              <button type="button" onclick="triggerNativeContactPick()" class="absolute right-3 top-2.5 text-slate-400 hover:text-[#006B3C]">
+                <i data-lucide="book-user" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div id="uVerifiedNameTag" class="hidden mt-1.5 p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 text-[11px] font-extrabold text-[#006B3C] dark:text-[#A8E600]">
+              ACCOUNT NAME: <span id="uVerifiedNameText">BELLO J. (Verified ✓)</span>
+            </div>
+          </div>
+
+          <div id="uProvidersSection">
+            <label id="uProviderSelectLabel" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Detected Network</label>
+            <div class="grid grid-cols-3 gap-1.5 text-center max-h-48 overflow-y-auto pr-1" id="uProvidersListGrid"></div>
+          </div>
+
+          <!-- USSD BALANCE HELPER -->
+          <div id="ussdHelperBox" class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 text-[10.5px]">
+            <div class="font-extrabold text-emerald-900 dark:text-emerald-300 mb-1">📶 Quick USSD Data Balance Check:</div>
+            <div class="grid grid-cols-3 gap-1 font-mono text-[9.5px]">
+              <div>MTN: <b class="text-[#006B3C] dark:text-[#A8E600]">*323*4#</b></div>
+              <div>Airtel: <b class="text-rose-600">*310#</b></div>
+              <div>Glo: <b class="text-emerald-600">*312#</b></div>
+              <div>9mob: <b class="text-teal-600">*323#</b></div>
+              <div>Labara: <b class="text-purple-600">*555#</b></div>
+              <div>Vital: <b class="text-blue-600">*444#</b></div>
+            </div>
+          </div>
+
+          <!-- A2C CONVERSION CALCULATION BOX -->
+          <div id="a2cCalcBox" class="hidden p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-500/30 text-xs space-y-1">
+            <div class="flex justify-between font-bold text-amber-900 dark:text-amber-200"><span>Conversion Rate:</span><b id="a2cRateText">85% Return</b></div>
+            <div class="flex justify-between font-bold text-amber-900 dark:text-amber-200"><span>Wallet Credit:</span><b id="a2cCreditText">₦0.00</b></div>
+            <p class="text-[10px] text-slate-500 mt-1">Airtime will be transferred via USSD to our automated merchant line.</p>
+          </div>
+
+          <!-- NIN & BVN MODIFICATION DYNAMIC INPUT FIELDS -->
+          <div id="uModFieldsWrap" class="hidden space-y-2.5 pt-1 text-xs font-bold">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 uppercase">Select Modification Category</label>
+              <select id="uModCategorySelect" onchange="renderModificationInputs()" class="w-full bg-slate-50 dark:bg-[#00170c] border rounded-xl px-3 py-2 text-xs font-bold">
+                <option value="dob">CHANGE DATE OF BIRTH</option>
+                <option value="name">CHANGE NAME</option>
+                <option value="number">CHANGE NUMBER</option>
+                <option value="address">CHANGE ADDRESS</option>
+              </select>
+            </div>
+            <div id="uDynamicModInputsContainer" class="space-y-2"></div>
+            
+            <div class="p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] space-y-2">
+              <span class="text-[10px] text-slate-400 uppercase">Supporting Document & Personal Photo</span>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <button type="button" onclick="document.getElementById('modDocFileInput').click()" class="w-full py-2 bg-white dark:bg-emerald-950 border border-slate-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1 active:scale-95 shadow-sm">
+                    <i data-lucide="paperclip" class="w-3.5 h-3.5 text-[#006B3C]"></i><span id="docUploadLabel">Attach Doc</span>
+                  </button>
+                  <input type="file" id="modDocFileInput" accept="image/*,.pdf" class="hidden" onchange="handleModDocAttached(event)" />
+                </div>
+                <div>
+                  <button type="button" onclick="document.getElementById('modPhotoFileInput').click()" class="w-full py-2 bg-white dark:bg-emerald-950 border border-slate-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1 active:scale-95 shadow-sm">
+                    <i data-lucide="camera" class="w-3.5 h-3.5 text-[#006B3C]"></i><span id="photoUploadLabel">Your Photo</span>
+                  </button>
+                  <input type="file" id="modPhotoFileInput" accept="image/*" class="hidden" onchange="handleModPhotoAttached(event)" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button id="uStep1ContinueBtn" onclick="proceedFromStep1()" class="w-full py-2.5 rounded-xl bg-[#006B3C] text-white font-bold text-xs tracking-wider shadow active:scale-95 transition flex items-center justify-center gap-1">
+            <span>Continue</span><i data-lucide="chevron-down" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: DATA CATEGORY / AMOUNT SELECT -->
+      <div class="mt-2.5 rounded-2xl border overflow-hidden shadow-sm" id="uCardStep2">
+        <div onclick="expandFlowStep(2)" class="p-3 bg-slate-50 dark:bg-emerald-950/40 border-b flex items-center justify-between cursor-pointer">
+          <div class="flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-[10px] font-black flex items-center justify-center" id="uStep2NumBadge">2</span>
+            <span id="uStep2TitleText" class="text-xs font-bold uppercase tracking-wider">DATA CATEGORY</span>
+          </div>
+          <span id="uStep2SummaryBadge" class="text-[10px] font-extrabold text-slate-400">Pending</span>
+        </div>
+
+        <div id="uStep2Body" class="hidden p-3.5 space-y-3 bg-white dark:bg-[#0A3321]">
+          <div id="uCategoryTabsWrap" class="space-y-2">
+            <div class="relative">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-3"></i>
+              <input type="text" id="uCategorySearchInput" oninput="filterDynamicCategories(this.value)" placeholder="Search category or plan..." class="w-full bg-slate-50 dark:bg-[#00170c] border rounded-xl pl-8 pr-3 py-2 text-xs font-bold focus:outline-none" />
+            </div>
+            <div class="flex gap-1.5 overflow-x-auto pb-1" id="uCategoryPillsWrap"></div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1" id="uPackagesGridContainer"></div>
+          
+          <!-- CUSTOM AMOUNT INPUT -->
+          <div id="uCustomAmountWrap" class="hidden pt-2 border-t space-y-1.5">
+            <div class="flex justify-between items-center"><label class="text-[11px] font-bold">Or Enter Custom Amount (₦)</label></div>
+            <div class="flex gap-2">
+              <input type="number" id="uCustomAmountInput" oninput="handleCustomAmountType(this.value)" placeholder="Min ₦50" class="flex-1 bg-slate-50 dark:bg-[#00170c] border rounded-xl px-3 py-2 text-xs font-black" />
+              <button onclick="handleCustomAmountContinue()" class="px-4 py-2 bg-[#006B3C] text-white font-bold text-xs rounded-xl">Continue</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEDICATED EXAM PIN PURCHASE MODAL -->
+  <div id="examPinModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[30px] sm:rounded-[26px] p-5 shadow-2xl max-h-[94vh] overflow-y-auto screen-in space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <h4 class="text-xs font-black uppercase flex items-center gap-1.5">
+          <i data-lucide="graduation-cap" class="w-4 h-4 text-[#006B3C]"></i>
+          <span>BUY EXAM SCRATCH CARD / TOKEN</span>
+        </h4>
+        <button onclick="closeModal('examPinModal')"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div id="examPinStep1" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">1. Candidate / Buyer Phone Number</label>
+          <input type="tel" id="examPinBuyerPhone" maxlength="11" placeholder="Enter phone number to receive PIN..." class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">2. Select Examination Body</label>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <button type="button" onclick="selectExamBodyForPin('WAEC', 3800)" id="epb-WAEC" class="exam-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left hover:border-[#006B3C]">
+              <div class="text-xl">🎓</div>
+              <b class="text-xs">WAEC</b>
+              <div class="text-[9px] text-slate-400">Senior School Certificate</div>
+            </button>
+            <button type="button" onclick="selectExamBodyForPin('NECO', 1250)" id="epb-NECO" class="exam-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left hover:border-[#006B3C]">
+              <div class="text-xl">🎓</div>
+              <b class="text-xs">NECO</b>
+              <div class="text-[9px] text-slate-400">National Exams Council</div>
+            </button>
+            <button type="button" onclick="selectExamBodyForPin('NABTEB', 1400)" id="epb-NABTEB" class="exam-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left hover:border-[#006B3C]">
+              <div class="text-xl">🎓</div>
+              <b class="text-xs">NABTEB</b>
+              <div class="text-[9px] text-slate-400">Technical & Business</div>
+            </button>
+            <button type="button" onclick="selectExamBodyForPin('JAMB', 7500)" id="epb-JAMB" class="exam-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left hover:border-[#006B3C]">
+              <div class="text-xl">🎓</div>
+              <b class="text-xs">JAMB</b>
+              <div class="text-[9px] text-slate-400">UTME / Direct Entry</div>
+            </button>
+          </div>
+        </div>
+        <button onclick="advanceExamPinStep(2)" class="w-full py-2.5 rounded-xl bg-[#006B3C] text-white font-bold text-xs shadow mt-2">Continue to Select Quantity →</button>
+      </div>
+
+      <div id="examPinStep2" class="hidden space-y-3">
+        <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950 border flex justify-between items-center text-xs">
+          <span>Selected Exam Body:</span><b id="epSelectedBodyText" class="text-[#006B3C]">WAEC</b>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Select Quantity of PINs</label>
+          <div class="grid grid-cols-5 gap-1.5 mt-1 text-center font-bold text-xs">
+            <button type="button" onclick="setExamPinQty(1)" class="ep-qty-btn p-2 rounded-xl border bg-slate-50 border-[#006B3C] text-[#006B3C]">1</button>
+            <button type="button" onclick="setExamPinQty(2)" class="ep-qty-btn p-2 rounded-xl border bg-slate-50">2</button>
+            <button type="button" onclick="setExamPinQty(3)" class="ep-qty-btn p-2 rounded-xl border bg-slate-50">3</button>
+            <button type="button" onclick="setExamPinQty(5)" class="ep-qty-btn p-2 rounded-xl border bg-slate-50">5</button>
+            <button type="button" onclick="setExamPinQty(10)" class="ep-qty-btn p-2 rounded-xl border bg-slate-50">10</button>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-50 dark:bg-[#00170c] border flex justify-between items-center text-sm font-black">
+          <span>Total Cost:</span><span id="epTotalCostText" class="text-emerald-700">₦3,800.00</span>
+        </div>
+        <button onclick="proceedToPayExamPin()" class="w-full py-3 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs shadow">Proceed to Pay →</button>
+        <button onclick="advanceExamPinStep(1)" class="w-full text-xs text-slate-400 font-bold">← Back to Exam Bodies</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEDICATED EXAM RESULT CHECKER MODAL -->
+  <div id="examResultFlowModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[30px] sm:rounded-[26px] p-5 shadow-2xl max-h-[94vh] overflow-y-auto screen-in space-y-3">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <h4 class="text-xs font-black uppercase flex items-center gap-1.5">
+          <i data-lucide="file-check" class="w-4 h-4 text-blue-600"></i>
+          <span>ONLINE EXAM RESULT CHECKER & PRINTING</span>
+        </h4>
+        <button onclick="closeModal('examResultFlowModal')"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div id="resStep1" class="space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">1. Candidate Examination / Registration Number</label>
+          <input type="text" id="resExamNumberInput" placeholder="e.g. 4251039481" class="w-full mt-1 p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">2. Select Examination Body</label>
+          <div class="grid grid-cols-2 gap-2 mt-1">
+            <button type="button" onclick="selectResultExamBody('WAEC')" class="res-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left border-blue-600 text-blue-700">
+              <b>🎓 WAEC Result</b>
+            </button>
+            <button type="button" onclick="selectResultExamBody('NECO')" class="res-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left">
+              <b>🎓 NECO Result</b>
+            </button>
+            <button type="button" onclick="selectResultExamBody('NABTEB')" class="res-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left">
+              <b>🎓 NABTEB Result</b>
+            </button>
+            <button type="button" onclick="selectResultExamBody('JAMB')" class="res-body-btn p-3 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-left">
+              <b>🎓 JAMB Result</b>
+            </button>
+          </div>
+        </div>
+        <button onclick="advanceResultStep(2)" class="w-full py-2.5 rounded-xl bg-[#006B3C] text-white font-bold text-xs shadow mt-2">Continue to Candidate Details →</button>
+      </div>
+
+      <div id="resStep2" class="hidden space-y-3">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Candidate Legal Name</label>
+          <input type="text" id="resCandNameVal" placeholder="Enter Full Legal Name..." class="w-full mt-1 p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">Exam Year</label>
+            <select id="resYearVal" class="w-full mt-1 p-2 border rounded-xl bg-slate-50 text-xs font-bold">
+              <option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">Exam Type</label>
+            <select class="w-full mt-1 p-2 border rounded-xl bg-slate-50 text-xs font-bold">
+              <option>School (May/June)</option><option>Private (GCE)</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Exam Scratch Card PIN / Token</label>
+          <input type="text" id="resPinVal" placeholder="Enter Scratch PIN or Token..." class="w-full mt-1 p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-xs font-bold font-mono" />
+        </div>
+        <button onclick="proceedToAuthorizeResultCheck()" class="w-full py-3 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs shadow">Proceed to Check & View Result →</button>
+        <button onclick="advanceResultStep(1)" class="w-full text-xs text-slate-400 font-bold">← Back to Exam Number</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM PURCHASE MODAL WITH AUTO-BIOMETRIC SENSOR SUPPORT -->
+  <div id="dataConfirmModal" class="hidden fixed inset-0 z-[10000] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-[#0A3321] rounded-[28px] p-5 shadow-2xl screen-in text-center space-y-3 my-auto">
+      <div class="flex items-center justify-between pb-2 border-b">
+        <h4 class="text-xs font-black uppercase">CONFIRM PURCHASE</h4>
+        <button onclick="closeModal('dataConfirmModal')"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 text-xs space-y-1.5 text-left">
+        <div class="flex justify-between"><span class="text-slate-500">Service:</span><b id="confServiceName">Service</b></div>
+        <div class="flex justify-between"><span class="text-slate-500">Provider:</span><b id="confNet">Provider</b></div>
+        <div class="flex justify-between"><span class="text-slate-500">Recipient / ID:</span><b id="confPhone">08031234567</b></div>
+        <div class="flex justify-between"><span class="text-slate-500">Package / Value:</span><b class="text-[#006B3C] dark:text-[#A8E600]" id="confPlanName">Package</b></div>
+        <div class="flex justify-between pt-1 border-t text-sm font-black">
+          <span>Amount to Pay:</span><span class="text-emerald-700 dark:text-[#A8E600]" id="confPrice">₦0.00</span>
+        </div>
+      </div>
+
+      <div class="space-y-3 pt-1">
+        <div class="space-y-1.5">
+          <div class="flex justify-between items-center px-1">
+            <label class="block text-xs font-bold text-slate-700 dark:text-slate-300">Authorize with 4-Digit PIN</label>
+            <button type="button" onclick="openForgotPinModal('fromPayment')" class="text-[10px] font-extrabold text-[#006B3C] dark:text-[#A8E600] hover:underline">Forgot PIN?</button>
+          </div>
+          <input type="password" id="orderPin" maxlength="4" placeholder="••••" class="w-36 text-center text-xl font-black py-2 bg-slate-100 dark:bg-[#00170c] rounded-xl tracking-[0.5em] outline-none mx-auto block border focus:border-[#006B3C]" />
+          <button id="btnConfirmPay" onclick="executeEnginePurchase('PIN')" class="w-full py-3 rounded-xl bg-[#006B3C] text-white font-extrabold text-xs shadow-lg active:scale-95 transition">PAY WITH PIN</button>
+        </div>
+
+        <div class="relative flex py-1 items-center">
+          <div class="flex-grow border-t border-slate-200 dark:border-emerald-800"></div>
+          <span class="flex-shrink mx-2 text-[10px] text-slate-400 uppercase font-black">OR USE BIOMETRICS</span>
+          <div class="flex-grow border-t border-slate-200 dark:border-emerald-800"></div>
+        </div>
+
+        <button onclick="triggerBiometricPurchase()" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-emerald-950 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition border border-emerald-600/30 shadow-sm">
+          <i data-lucide="fingerprint" class="w-4 h-4 text-[#006B3C] dark:text-[#A8E600]"></i>
+          <span>Pay with Fingerprint Sensor</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE BIOMETRIC SENSOR MODAL -->
+  <div id="biometricSensorModal" class="hidden fixed inset-0 z-[10005] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-[#0A3321] rounded-[28px] p-6 text-center space-y-4 shadow-2xl screen-in border border-emerald-500/30">
+      <div class="space-y-1">
+        <h4 class="text-sm font-black uppercase text-slate-900 dark:text-white" id="bioModalTitle">Biometric Authentication</h4>
+        <p class="text-xs text-slate-500" id="bioModalSubtitle">Touch the fingerprint sensor to authorize</p>
+      </div>
+
+      <div class="relative w-28 h-28 mx-auto flex items-center justify-center cursor-pointer select-none" onclick="confirmBiometricSensorTouch()">
+        <div id="bioSensorCircle" class="w-24 h-24 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border-2 border-dashed border-[#006B3C] dark:border-[#A8E600] flex items-center justify-center relative overflow-hidden transition-all duration-300">
+          <div class="scanner-laser" id="bioLaserLine"></div>
+          <i data-lucide="fingerprint" class="w-14 h-14 text-[#006B3C] dark:text-[#A8E600] transition-transform duration-300 transform active:scale-95"></i>
+        </div>
+      </div>
+
+      <div class="text-[11px] font-bold text-emerald-700 dark:text-emerald-300" id="bioSensorStatusText">
+        Tap sensor icon or place finger on sensor
+      </div>
+
+      <button onclick="cancelBiometricSensor()" class="w-full py-2.5 rounded-xl bg-slate-100 dark:bg-[#00170c] text-xs font-bold text-slate-600 dark:text-slate-300">
+        Cancel / Pay with PIN Instead
+      </button>
+    </div>
+  </div>
+
+  <!-- COMPLETE FORGOT / RESET PIN WORKFLOW MODAL -->
+  <div id="forgotPinFlowModal" class="hidden fixed inset-0 z-[10002] bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-[#0A3321] rounded-[28px] p-5 shadow-2xl screen-in space-y-3.5 text-center">
+      <div class="flex items-center justify-between pb-2 border-b">
+        <h4 class="text-xs font-black uppercase flex items-center gap-1.5 text-emerald-800 dark:text-[#A8E600]">
+          <i data-lucide="key-round" class="w-4 h-4"></i>
+          <span>Reset 4-Digit Security PIN</span>
+        </h4>
+        <button onclick="closeModal('forgotPinFlowModal')"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+      </div>
+
+      <!-- Step 1: Identity Confirmation -->
+      <div id="fPinStep1" class="space-y-3 text-left">
+        <p class="text-xs text-slate-500">Confirm your registered phone number to receive a secure reset authorization code.</p>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">Registered Phone Number</label>
+          <input type="tel" id="fPinPhoneVal" maxlength="11" placeholder="08012345678" class="w-full mt-1 p-2.5 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <button onclick="advanceForgotPinStep(2)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl shadow active:scale-95 transition">
+          Send Verification OTP →
+        </button>
+      </div>
+
+      <!-- Step 2: OTP Verification -->
+      <div id="fPinStep2" class="hidden space-y-3 text-left">
+        <p class="text-xs text-slate-500">Enter the 6-digit confirmation code sent to <b id="fPinTargetPhoneText" class="text-slate-900 dark:text-white">0801***</b></p>
+        <div>
+          <input type="tel" id="fPinOtpInput" maxlength="6" placeholder="123456" class="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-xl font-black tracking-widest outline-none" />
+        </div>
+        <button onclick="advanceForgotPinStep(3)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl shadow active:scale-95 transition">
+          Verify OTP Code →
+        </button>
+        <button onclick="advanceForgotPinStep(1)" class="w-full text-xs text-slate-400 font-bold text-center">← Back to Phone</button>
+      </div>
+
+      <!-- Step 3: Create New PIN -->
+      <div id="fPinStep3" class="hidden space-y-2.5 text-left">
+        <p class="text-xs text-slate-500">Create your brand new 4-digit security transaction PIN.</p>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase">New 4-Digit PIN</label>
+          <input type="password" id="fPinNew1" maxlength="4" placeholder="••••" class="w-full mt-1 p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-xl font-black tracking-widest outline-none" />
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase">Confirm New 4-Digit PIN</label>
+          <input type="password" id="fPinNew2" maxlength="4" placeholder="••••" class="w-full mt-1 p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-xl font-black tracking-widest outline-none" />
+        </div>
+        <button onclick="finalizeForgotPinReset()" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-extrabold rounded-xl shadow active:scale-95 transition">
+          Set New Security PIN ✓
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- UPGRADED ENTERPRISE RECEIPT -->
+  <div id="dataReceiptModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="printableReceiptArea" class="w-full max-w-sm bg-white dark:bg-[#0A3321] rounded-[26px] p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto border border-emerald-800/30 text-center screen-in">
+      <button onclick="closeModal('dataReceiptModal')" class="no-print absolute top-4 right-4 p-1.5 rounded-full bg-slate-100 text-slate-500"><i data-lucide="x" class="w-4 h-4"></i></button>
+
+      <div class="pt-2">
+        <div class="flex items-center justify-center gap-1.5 text-xs font-black tracking-widest text-[#006B3C] dark:text-[#A8E600] mb-2 uppercase">
+          <div class="w-5 h-5 rounded bg-[#006B3C] text-white flex items-center justify-center text-[10px]">Q</div>
+          <span>QUDSIYYASUB DIGITAL</span>
+        </div>
+        <div class="w-14 h-14 bg-emerald-100 text-[#006B3C] rounded-full mx-auto flex items-center justify-center mb-1.5 border-4 border-emerald-400/50 shadow-inner">
+          <i data-lucide="check" class="w-8 h-8 stroke-[3]"></i>
+        </div>
+        <h4 class="text-[10px] uppercase tracking-widest text-emerald-700 dark:text-emerald-300 font-black">TRANSACTION SUCCESSFUL</h4>
+        <div class="text-3xl font-black mt-0.5 tracking-tight" id="dRecAmount">₦0.00</div>
+        <div class="text-xs font-bold text-slate-600 dark:text-slate-300 mt-0.5" id="dRecPlan">Service Completed</div>
+
+        <div class="mt-4 p-3.5 bg-slate-50 dark:bg-[#00170c] rounded-2xl text-left text-xs space-y-2 border border-slate-100 font-medium">
+          <div class="flex justify-between items-center bg-emerald-100/60 dark:bg-emerald-950 p-2 rounded-xl border border-emerald-200/50">
+            <span class="text-emerald-900 dark:text-emerald-200 font-bold">Customer Name:</span>
+            <span class="font-black text-[#006B3C] dark:text-[#A8E600] customer-full-name-display">Jamilu Abubakar</span>
+          </div>
+          <div class="flex justify-between"><span class="text-slate-400">Transaction ID:</span><span class="font-bold font-mono" id="dRecRef">QDS-8492019</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Recipient / ID:</span><span class="font-bold" id="dRecPhone">08031234567</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Provider:</span><span class="font-bold" id="dRecNet">MTN Nigeria</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Service Charge:</span><span class="font-bold text-emerald-600">₦0.00 (FREE)</span></div>
+          <div class="flex justify-between border-t border-slate-200/60 pt-1.5"><span class="text-slate-400">Gregorian Date:</span><span class="font-bold text-[11px]" id="dRecGregorian">Date</span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Islamic Date:</span><span class="font-bold text-amber-700 text-[11px]" id="dRecHijri">Hijri</span></div>
+
+          <div id="dRecSpecialContainer" class="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 text-emerald-950 font-mono text-center text-xs mt-2"></div>
+
+          <div class="flex items-center justify-between pt-2 border-t border-slate-200/60">
+            <div class="text-[9px] text-slate-400 font-mono leading-tight">
+              VERIFIED SECURE TRANSACTION<br>CBN-NIBSS-COMPLIANT-2026<br><span class="text-[#006B3C] font-bold">DIGITALLY SIGNED ✓</span>
+            </div>
+            <div class="p-1 bg-white rounded-lg border shadow-sm flex items-center justify-center">
+              <svg class="w-12 h-12" viewBox="0 0 29 29" fill="black">
+                <path d="M0,0 h7 v7 h-7 z M1,1 v5 h5 v-5 z M2,2 h3 v3 h-3 z" />
+                <path d="M22,0 h7 v7 h-7 z M23,1 v5 h5 v-5 z M24,2 h3 v3 h-3 z" />
+                <path d="M0,22 h7 v7 h-7 z M1,23 v5 h5 v-5 z M2,24 h3 v3 h-3 z" />
+                <rect x="9" y="1" width="2" height="2" fill="#006B3C"/><rect x="13" y="1" width="2" height="2"/><rect x="17" y="1" width="2" height="2" fill="#006B3C"/>
+                <rect x="9" y="5" width="2" height="2"/><rect x="15" y="5" width="2" height="2" fill="#006B3C"/>
+                <rect x="1" y="9" width="2" height="2"/><rect x="5" y="9" width="2" height="2" fill="#006B3C"/>
+                <rect x="9" y="9" width="3" height="3" fill="#006B3C"/><rect x="14" y="9" width="3" height="3"/><rect x="19" y="9" width="2" height="2" fill="#006B3C"/>
+                <rect x="23" y="9" width="2" height="2"/><rect x="9" y="14" width="2" height="2"/><rect x="13" y="13" width="3" height="3" fill="#006B3C"/>
+                <rect x="18" y="14" width="2" height="2"/><rect x="23" y="14" width="2" height="2" fill="#006B3C"/>
+                <rect x="9" y="18" width="2" height="2" fill="#006B3C"/><rect x="13" y="18" width="3" height="3"/><rect x="19" y="19" width="2" height="2" fill="#006B3C"/>
+                <rect x="1" y="18" width="2" height="2"/><rect x="5" y="19" width="2" height="2"/><rect x="9" y="23" width="2" height="2" fill="#006B3C"/>
+                <rect x="13" y="24" width="2" height="2"/><rect x="17" y="23" width="2" height="2" fill="#006B3C"/>
+                <rect x="21" y="23" width="3" height="3"/><rect x="25" y="25" width="2" height="2" fill="#006B3C"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-print grid grid-cols-2 gap-2 mt-4" id="receiptActionButtonsRow">
+        <button type="button" onclick="toggleDownloadChoice()" class="py-2.5 rounded-xl bg-slate-900 text-white text-xs font-black flex items-center justify-center gap-1.5 shadow active:scale-95 border border-slate-700">
+          <i data-lucide="download" class="w-3.5 h-3.5 text-[#A8E600]"></i> Print / PDF
+        </button>
+        <button type="button" onclick="shareDataReceiptNative()" class="py-2.5 rounded-xl bg-[#00A651] text-white text-xs font-black flex items-center justify-center gap-1.5 shadow active:scale-95">
+          <i data-lucide="share-2" class="w-3.5 h-3.5"></i> WhatsApp
+        </button>
+      </div>
+
+      <div id="receiptDownloadOptions" class="no-print hidden mt-2.5 p-3 rounded-2xl bg-emerald-950/10 border border-emerald-600/30 space-y-2">
+        <div class="text-[10px] font-black text-slate-700 dark:text-emerald-300 text-center uppercase tracking-wider">Choose Download Format:</div>
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" onclick="downloadReceiptAsPhoto()" id="btnSavePhoto" class="py-2.5 px-2 rounded-xl bg-[#006B3C] text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow active:scale-95 border border-[#A8E600]/40">
+            <i data-lucide="image" class="w-3.5 h-3.5 text-[#A8E600]"></i><span>Save Photo</span>
+          </button>
+          <button type="button" onclick="downloadReceiptAsPDF()" id="btnSavePDF" class="py-2.5 px-2 rounded-xl bg-slate-900 text-white text-xs font-extrabold flex items-center justify-center gap-1.5 shadow active:scale-95 border border-slate-700">
+            <i data-lucide="file-text" class="w-3.5 h-3.5 text-[#A8E600]"></i><span>Save PDF</span>
+          </button>
+        </div>
+      </div>
+      <button onclick="closeModal('dataReceiptModal')" class="no-print w-full mt-2.5 py-1 text-center text-xs text-slate-400 font-bold hover:text-slate-600">Back to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- DIGITAL IDENTITY SLIP CARD MODAL -->
+  <div id="idSlipPreviewModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="printableIdSlipArea" class="w-full max-w-sm bg-white rounded-[26px] p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-left border space-y-3 screen-in">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <div class="flex items-center gap-1.5 font-black text-xs uppercase text-[#006B3C]">
+          <span>🆔</span> <span id="slipHeaderBadgeTitle">FEDERAL REPUBLIC OF NIGERIA</span>
+        </div>
+        <button onclick="closeModal('idSlipPreviewModal')" class="no-print p-1 rounded-full bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <div class="p-3.5 rounded-2xl bg-gradient-to-tr from-emerald-800 to-[#006B3C] text-white space-y-2 relative overflow-hidden shadow-lg border border-[#A8E600]/40">
+        <div class="flex justify-between items-start">
+          <div>
+            <div class="text-[9px] font-black text-emerald-200 tracking-wider uppercase" id="slipCardSub">NATIONAL IDENTITY MANAGEMENT COMMISSION</div>
+            <div class="text-sm font-black mt-0.5 tracking-tight" id="slipHolderName">JAMILU ABUBAKAR BELLO</div>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/40 flex items-center justify-center font-bold text-sm customer-personal-avatar overflow-hidden">
+            <span class="customer-avatar-initials">JA</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-1 text-[10px] font-mono pt-1 border-t border-emerald-600/50">
+          <div>DOB: <b id="slipDobVal">14/08/1996</b></div>
+          <div>GENDER: <b>MALE</b></div>
+        </div>
+        <div class="pt-1.5 flex justify-between items-end border-t border-emerald-600/50">
+          <div>
+            <div class="text-[8px] uppercase tracking-wider text-emerald-300 font-bold" id="slipIdLabel">NATIONAL IDENTITY NUMBER (NIN)</div>
+            <div class="text-base font-black tracking-widest text-[#A8E600]" id="slipIdNumber">2849 2019 482</div>
+          </div>
+          <div class="p-1 bg-white rounded"><i data-lucide="qr-code" class="w-6 h-6 text-black"></i></div>
+        </div>
+      </div>
+
+      <div class="no-print grid grid-cols-3 gap-1.5 pt-1" id="slipButtonsRow">
+        <button onclick="downloadSlipDirect('photo')" class="py-2.5 rounded-xl bg-[#006B3C] text-white text-[11px] font-bold flex flex-col items-center gap-0.5 active:scale-95 shadow">
+          <i data-lucide="image" class="w-4 h-4"></i><span>Save Photo</span>
+        </button>
+        <button onclick="downloadSlipDirect('pdf')" class="py-2.5 rounded-xl bg-slate-900 text-white text-[11px] font-bold flex flex-col items-center gap-0.5 active:scale-95 shadow">
+          <i data-lucide="file-text" class="w-4 h-4"></i><span>Save PDF</span>
+        </button>
+        <button onclick="shareSlipWhatsApp()" class="py-2.5 rounded-xl bg-[#00A651] text-white text-[11px] font-bold flex flex-col items-center gap-0.5 active:scale-95 shadow">
+          <i data-lucide="share-2" class="w-4 h-4"></i><span>WhatsApp</span>
+        </button>
+      </div>
+      <button onclick="openDebitReceiptAfterSlip()" class="no-print w-full py-2.5 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold text-center border">View Debit Receipt →</button>
+    </div>
+  </div>
+
+  <!-- RESULT SLIP VIEW MODAL -->
+  <div id="resultSlipModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="printableResultArea" class="w-full max-w-md bg-white rounded-[26px] p-5 shadow-2xl relative max-h-[92vh] overflow-y-auto text-left border space-y-3 screen-in">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <div class="flex items-center gap-1.5 font-black text-xs uppercase text-[#006B3C]">
+          <span>🎓</span> <span id="resExamBodyTitle">WAEC RESULT SLIP</span>
+        </div>
+        <button onclick="closeModal('resultSlipModal')" class="no-print p-1 rounded-full bg-slate-100"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="p-3 bg-slate-50 border rounded-xl text-xs space-y-1">
+        <div class="flex justify-between"><span>Candidate Name:</span><b id="resDisplayCandName">ABUBAKAR JAMILU BELLO</b></div>
+        <div class="flex justify-between"><span>Exam Number:</span><b class="font-mono" id="resDisplayExamNo">4251039481</b></div>
+        <div class="flex justify-between"><span>Exam Year / Type:</span><b id="resDisplayExamYear">2026 (MAY/JUNE)</b></div>
+      </div>
+      <div class="border rounded-xl overflow-hidden text-xs">
+        <div class="grid grid-cols-2 bg-emerald-800 text-white p-2 font-black text-[11px]">
+          <span>SUBJECT</span><span class="text-right">GRADE</span>
+        </div>
+        <div class="divide-y font-bold p-2 space-y-1 text-[11px]">
+          <div class="flex justify-between py-1"><span>English Language</span><b class="text-emerald-700">A1</b></div>
+          <div class="flex justify-between py-1"><span>Mathematics</span><b class="text-emerald-700">B2</b></div>
+          <div class="flex justify-between py-1"><span>Physics</span><b class="text-emerald-700">B3</b></div>
+          <div class="flex justify-between py-1"><span>Chemistry</span><b class="text-emerald-700">A1</b></div>
+          <div class="flex justify-between py-1"><span>Biology</span><b class="text-emerald-700">B2</b></div>
+        </div>
+      </div>
+      <div class="no-print grid grid-cols-2 gap-2 pt-2" id="resultSlipButtonsRow">
+        <button onclick="downloadResultSlipDirect('pdf')" class="py-2.5 rounded-xl bg-[#006B3C] text-white text-xs font-bold">Save as PDF</button>
+        <button onclick="downloadResultSlipDirect('photo')" class="py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold">Save as Photo</button>
+      </div>
+      <button onclick="closeModal('resultSlipModal')" class="no-print w-full text-xs text-slate-400 font-bold text-center">Close Result Slip</button>
+    </div>
+  </div>
+
+  <!-- STEP-BY-STEP CHANGE PIN MODAL -->
+  <div id="changePinFlowModal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-[#0A3321] rounded-[24px] p-5 shadow-2xl space-y-3 screen-in text-center">
+      <h4 class="text-sm font-black uppercase">Change 4-Digit Security PIN</h4>
+      
+      <div id="pinStep1" class="space-y-2 text-left">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase">Enter Current PIN</label>
+        <input type="password" id="oldPinVal" maxlength="4" placeholder="••••" class="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-xl font-black tracking-widest outline-none" />
+        <button onclick="advancePinStep(2)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2">Next: Send OTP →</button>
+      </div>
+
+      <div id="pinStep2" class="hidden space-y-2 text-left">
+        <p class="text-[11px] text-slate-500">We sent a 6-digit confirmation code to your phone (0801***).</p>
+        <input type="tel" id="pinOtpVal" maxlength="6" placeholder="123456" class="w-full p-2.5 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-lg font-black tracking-widest outline-none" />
+        <button onclick="advancePinStep(3)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2">Verify OTP & Continue</button>
+      </div>
+
+      <div id="pinStep3" class="hidden space-y-2 text-left">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase">Enter New 4-Digit PIN</label>
+        <input type="password" id="newPin1" maxlength="4" placeholder="••••" class="w-full p-2 border rounded-xl bg-slate-50 text-center text-xl font-black tracking-widest outline-none" />
+        <label class="block text-[10px] font-bold text-slate-400 uppercase mt-1">Confirm New 4-Digit PIN</label>
+        <input type="password" id="newPin2" maxlength="4" placeholder="••••" class="w-full p-2 border rounded-xl bg-slate-50 text-center text-xl font-black tracking-widest outline-none" />
+        <button onclick="finalizeNewPin()" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2 shadow">Save New PIN ✓</button>
+      </div>
+      <button onclick="closeModal('changePinFlowModal')" class="text-xs text-slate-400 font-bold">Cancel</button>
+    </div>
+  </div>
+
+  <!-- STEP-BY-STEP CHANGE PASSWORD WITH OTP MODAL -->
+  <div id="changePasswordFlowModal" class="hidden fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-[#0A3321] rounded-[24px] p-5 shadow-2xl space-y-3 screen-in text-center">
+      <h4 class="text-sm font-black uppercase">Change Password</h4>
+      
+      <div id="passStep1" class="space-y-2 text-left">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase">Current Password</label>
+        <input type="password" id="oldPassVal" placeholder="Enter current password" class="w-full p-2 border rounded-xl bg-slate-50 text-xs font-bold outline-none" />
+        <button onclick="advancePassStep(2)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2">Next: Send OTP →</button>
+      </div>
+
+      <div id="passStep2" class="hidden space-y-2 text-left">
+        <p class="text-[11px] text-slate-500">Enter OTP sent to your registered contact.</p>
+        <input type="tel" id="passOtpVal" maxlength="6" placeholder="123456" class="w-full p-2.5 border rounded-xl bg-slate-50 text-center text-lg font-black tracking-widest outline-none" />
+        <button onclick="advancePassStep(3)" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2">Verify OTP</button>
+      </div>
+
+      <div id="passStep3" class="hidden space-y-2 text-left">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase">New Password</label>
+        <input type="password" id="newPass1" placeholder="Min. 8 characters" class="w-full p-2 border rounded-xl bg-slate-50 text-xs font-bold outline-none" />
+        <button onclick="finalizeNewPass()" class="w-full py-2.5 bg-[#006B3C] text-white text-xs font-bold rounded-xl mt-2 shadow">Update Password ✓</button>
+      </div>
+      <button onclick="closeModal('changePasswordFlowModal')" class="text-xs text-slate-400 font-bold">Cancel</button>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[28px] sm:rounded-[24px] p-5 shadow-2xl max-h-[92vh] overflow-y-auto space-y-3 screen-in">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <h3 class="text-sm font-black uppercase">User Profile & Account Center</h3>
+        <button onclick="closeModal('profileModal')"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+
+      <!-- CARD 1 -->
+      <div class="p-4 rounded-2xl bg-slate-50 dark:bg-[#00170c] border text-center space-y-2">
+        <div class="relative w-20 h-20 mx-auto cursor-pointer" onclick="document.getElementById('avatarUploadInput').click()">
+          <div id="profileUserAvatar" class="w-20 h-20 rounded-3xl bg-[#006B3C] text-white font-black text-2xl flex items-center justify-center border-2 border-[#A8E600] overflow-hidden customer-personal-avatar shadow">
+            <span class="customer-avatar-initials">JA</span>
+          </div>
+          <div class="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[#A8E600] text-slate-950 flex items-center justify-center shadow"><i data-lucide="camera" class="w-3.5 h-3.5"></i></div>
+        </div>
+        <input type="file" id="avatarUploadInput" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)" />
+        <h4 class="text-base font-black customer-full-name-display">Jamilu Abubakar</h4>
+        <p class="text-xs text-slate-400">jamilu@qudsiyyasub.com</p>
+
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t">
+          <button onclick="toggleProfileSection('settingsSection')" class="py-2 rounded-xl bg-[#006B3C] text-white text-xs font-bold active:scale-95 shadow">⚙️ SETTINGS</button>
+          <button onclick="toggleProfileSection('profileInfoSection')" class="py-2 rounded-xl bg-slate-200 dark:bg-emerald-950 text-slate-800 dark:text-slate-200 text-xs font-bold active:scale-95">👤 PROFILE INFO</button>
+        </div>
+      </div>
+
+      <!-- PROFILE INFO EDIT -->
+      <div id="profileInfoSection" class="hidden p-3.5 rounded-2xl bg-white dark:bg-[#072a20] border space-y-2.5">
+        <h5 class="text-xs font-black uppercase text-[#006B3C]">Edit Profile Information</h5>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase">Username / Full Name</label>
+          <input type="text" id="editUsernameInput" value="Jamilu Abubakar" class="w-full mt-1 p-2 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-slate-400 uppercase">Phone Number</label>
+          <input type="tel" id="editPhoneInput" value="08012345678" class="w-full mt-1 p-2 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold" />
+        </div>
+        <button onclick="saveProfileInfo()" class="w-full py-2.5 rounded-xl bg-[#006B3C] text-white text-xs font-bold shadow">Save Changes ✓</button>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="settingsSection" class="hidden p-3.5 rounded-2xl bg-white dark:bg-[#072a20] border space-y-3">
+        <h5 class="text-xs font-black uppercase text-[#006B3C]">System Settings & Security</h5>
+        <div class="grid grid-cols-3 gap-1 text-[10.5px] font-bold">
+          <button onclick="openModal('changePinFlowModal')" class="p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center">🔐 Change PIN</button>
+          <button onclick="openForgotPinModal('fromSettings')" class="p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center text-amber-600">🔑 Reset PIN</button>
+          <button onclick="openModal('changePasswordFlowModal')" class="p-2 border rounded-xl bg-slate-50 dark:bg-[#00170c] text-center">🛡️ Password</button>
+        </div>
+        <div class="space-y-2 pt-2 border-t text-xs font-bold">
+          <label class="flex justify-between items-center cursor-pointer"><span>Fingerprint Login</span><input type="checkbox" id="bioLoginPref" checked onchange="toggleBioSetting(this, 'LOGIN')" class="accent-[#006B3C] w-4 h-4" /></label>
+          <label class="flex justify-between items-center cursor-pointer"><span>Fingerprint Transaction</span><input type="checkbox" id="bioTxPref" checked onchange="toggleBioSetting(this, 'TX')" class="accent-[#006B3C] w-4 h-4" /></label>
+        </div>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#00170c] border text-xs space-y-1.5 font-bold">
+        <div class="text-[10px] text-slate-400 uppercase mb-1">Customer Overview</div>
+        <div class="flex justify-between"><span>Name:</span><b class="customer-full-name-display">Jamilu Abubakar</b></div>
+        <div class="flex justify-between"><span>Email:</span><b>jamilu@qudsiyyasub.com</b></div>
+        <div class="flex justify-between"><span>Phone:</span><b id="profilePhoneDisplay">08012345678</b></div>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-900 to-[#006B3C] text-white flex justify-between items-center">
+        <div><span class="text-[10px] text-emerald-200">TOTAL WALLET BALANCE</span><div class="text-xl font-black" id="profileWalletDisplay">₦50,000.00</div></div>
+        <button onclick="openFundWalletModal(); closeModal('profileModal');" class="px-3 py-1.5 rounded-xl bg-[#A8E600] text-emerald-950 text-xs font-black">Fund</button>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-[#00170c] border space-y-2 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="font-extrabold uppercase text-[10px] text-slate-500">KYC Verification Status</span>
+          <span id="kycLevelBadge" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black">LEVEL 2 VERIFIED ✓</span>
+        </div>
+        <div class="space-y-1.5 pt-1">
+          <div class="flex justify-between items-center p-2 rounded-xl border bg-white dark:bg-[#0A3321]">
+            <span>NIN Verification (Level 2)</span><span class="text-emerald-600 font-extrabold text-[10px]">Verified ✓</span>
+          </div>
+          <div class="flex justify-between items-center p-2 rounded-xl border bg-white dark:bg-[#0A3321]">
+            <span>BVN Verification (Level 3)</span>
+            <button onclick="upgradeKycToLevel3()" class="px-2.5 py-1 rounded-lg bg-[#006B3C] text-white text-[10px] font-bold">Upgrade Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUND WALLET MODAL -->
+  <div id="fundWalletModal" class="hidden fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[28px] sm:rounded-[24px] p-5 shadow-2xl space-y-3 screen-in">
+      <div class="flex justify-between items-center pb-2 border-b">
+        <h3 class="text-sm font-black uppercase">Fund Wallet (Dedicated Accounts)</h3>
+        <button onclick="closeModal('fundWalletModal')"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <p class="text-xs text-slate-500">Automated instant wallet funding via bank transfer:</p>
+      
+      <div class="p-3 rounded-2xl bg-[#DCEEE5] dark:bg-[#00170c] border flex justify-between items-center">
+        <div>
+          <span class="text-[9px] bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">OPAY DIGITAL</span>
+          <div class="text-sm font-black text-slate-900 dark:text-white mt-1">9012345678</div>
+          <div class="text-[9px] text-slate-400 font-bold uppercase">QUDSIYYASUB / JAMILU ABUBAKAR</div>
+        </div>
+        <button onclick="copyToClipboard('9012345678','OPay Account')" class="px-3 py-1.5 bg-[#006B3C] text-white rounded-lg text-xs font-bold shadow">Copy</button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-[#DCEEE5] dark:bg-[#00170c] border flex justify-between items-center">
+        <div>
+          <span class="text-[9px] bg-blue-600 text-white font-bold px-1.5 py-0.5 rounded">MONIEPOINT MFB</span>
+          <div class="text-sm font-black text-slate-900 dark:text-white mt-1">8098765432</div>
+          <div class="text-[9px] text-slate-400 font-bold uppercase">QUDSIYYASUB / JAMILU ABUBAKAR</div>
+        </div>
+        <button onclick="copyToClipboard('8098765432','Moniepoint Account')" class="px-3 py-1.5 bg-[#006B3C] text-white rounded-lg text-xs font-bold shadow">Copy</button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-[#DCEEE5] dark:bg-[#00170c] border flex justify-between items-center">
+        <div>
+          <span class="text-[9px] bg-purple-700 text-white font-bold px-1.5 py-0.5 rounded">WEMA BANK</span>
+          <div class="text-sm font-black text-slate-900 dark:text-white mt-1">0234567891</div>
+          <div class="text-[9px] text-slate-400 font-bold uppercase">QUDSIYYASUB / JAMILU ABUBAKAR</div>
+        </div>
+        <button onclick="copyToClipboard('0234567891','Wema Account')" class="px-3 py-1.5 bg-[#006B3C] text-white rounded-lg text-xs font-bold shadow">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULL TRANSACTION MODAL -->
+  <div id="fullTxModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="w-full max-w-md bg-white dark:bg-[#0A3321] rounded-t-[28px] sm:rounded-[24px] p-5 shadow-2xl max-h-[92vh] overflow-y-auto screen-in space-y-2">
+      <div class="flex justify-between items-center pb-2 border-b"><h4 class="text-sm font-black uppercase">Transaction History</h4><button onclick="closeModal('fullTxModal')"><i data-lucide="x" class="w-4 h-4"></i></button></div>
+      <div>
+        <input type="text" id="txSearchInput" oninput="filterFullTransactions(this.value)" placeholder="Search by recipient, ref, or service..." class="w-full p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] text-xs font-bold outline-none" />
+      </div>
+      <div id="fullTxContainer" class="space-y-2 mt-2 max-h-[60vh] overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[10001] px-4 py-2 rounded-full bg-slate-900 text-white text-xs font-bold shadow-2xl border border-slate-700"></div>
+
+  <!-- JAVASCRIPT MASTER SYSTEM LOGIC -->
+  <script>
+    function safeCreateIcons() {
+      if (window.lucide && typeof lucide.createIcons === 'function') {
+        try { lucide.createIcons(); } catch (e) {}
+      }
+    }
+    safeCreateIcons();
+
+    let currentBalance = parseFloat(localStorage.getItem('qudsiyyasub_balance')) || 5000.0;
+    let customerFullName = localStorage.getItem('qudsiyyasub_customer_name') || 'Jamilu Abubakar';
+    let customerPersonalAvatar = localStorage.getItem('qudsiyyasub_customer_avatar') || '';
+    let savedPhone = localStorage.getItem('qudsiyyasub_remember_phone') || '';
+    let customerPin = localStorage.getItem('qudsiyyasub_user_pin') || '1234';
+    let forgotPinTriggerSource = 'fromSettings';
+
+    let transactionsHistory = JSON.parse(localStorage.getItem('qudsiyyasub_txs')) || [
+      { id: 'QDS-8492019', service: 'MTN 1.0 GB SME Data', type: 'data', target: '08031234567', amount: 300.0, date: 'Today, 2:15 PM', status: 'Success' },
+      { id: 'QDS-7391024', service: 'Wallet Top-up (OPay)', type: 'credit', target: '9012345678', amount: 5000.0, date: 'Today, 1:40 PM', status: 'Credit' }
+    ];
+
+    function getInitials(name) {
+      if (!name) return 'QA';
+      const parts = name.trim().split(' ');
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function updateAvatarDisplay(imgSrc) {
+      const inits = getInitials(customerFullName);
+      document.querySelectorAll('.customer-avatar-initials').forEach(el => el.innerText = inits);
+      if (imgSrc) {
+        document.querySelectorAll('.customer-personal-avatar').forEach(el => {
+          el.innerHTML = `<img src="${imgSrc}" class="w-full h-full object-cover rounded-xl" />`;
+        });
+      } else {
+        document.querySelectorAll('.customer-personal-avatar').forEach(el => {
+          el.innerHTML = `<span>${inits}</span>`;
+        });
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateAvatarDisplay(customerPersonalAvatar);
+      document.querySelectorAll('.customer-full-name-display').forEach(el => el.innerText = customerFullName);
+      const bDisp = document.getElementById('balanceDisplay');
+      if (bDisp) bDisp.innerText = `₦${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      const pDisp = document.getElementById('profileWalletDisplay');
+      if (pDisp) pDisp.innerText = `₦${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      if (savedPhone) {
+        const pInp = document.getElementById('loginPhoneInput');
+        if (pInp) pInp.value = savedPhone;
+      }
+
+      const bioTxPref = localStorage.getItem('qudsiyyasub_bio_tx');
+      if (bioTxPref !== null) {
+        const bioTxCheckbox = document.getElementById('bioTxPref');
+        if (bioTxCheckbox) bioTxCheckbox.checked = (bioTxPref === 'true');
+      }
+
+      const bioLoginPref = localStorage.getItem('qudsiyyasub_bio_login');
+      if (bioLoginPref !== null) {
+        const bioLoginCheckbox = document.getElementById('bioLoginPref');
+        if (bioLoginCheckbox) bioLoginCheckbox.checked = (bioLoginPref === 'true');
+      }
+    });
+
+    function handleAvatarUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64 = e.target.result;
+        customerPersonalAvatar = base64;
+        localStorage.setItem('qudsiyyasub_customer_avatar', base64);
+        updateAvatarDisplay(base64);
+        showToast('✓ Profile photo updated successfully!');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function playFintechSuccessSound() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator(), gain1 = audioCtx.createGain();
+        osc1.type = 'sine'; osc1.frequency.setValueAtTime(587.33, now);
+        gain1.gain.setValueAtTime(0.2, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+        osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.35);
+
+        const osc2 = audioCtx.createOscillator(), gain2 = audioCtx.createGain();
+        osc2.type = 'sine'; osc2.frequency.setValueAtTime(880, now + 0.12);
+        gain2.gain.setValueAtTime(0.3, now + 0.12); gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(now + 0.12); osc2.stop(now + 0.6);
+      } catch (e) {}
+    }
+
+    function getCalculatedDates() {
+      const now = new Date();
+      const gregorian = new Intl.DateTimeFormat('en-GB', { 
+        weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' 
+      }).format(now);
+
+      let hijri = '';
+      try {
+        hijri = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { 
+          day: 'numeric', month: 'long', year: 'numeric' 
+        }).format(now) + ' AH';
+      } catch (e) {
+        try {
+          hijri = new Intl.DateTimeFormat('en-u-ca-islamic', { 
+            day: 'numeric', month: 'long', year: 'numeric' 
+          }).format(now) + ' AH';
+        } catch (err) {
+          const hijriMonths = ["Muharram","Safar","Rabi' al-Awwal","Rabi' al-Thani","Jumada al-Awwal","Jumada al-Thani","Rajab","Sha'ban","Ramadan","Shawwal","Dhu al-Qi'dah","Dhu al-Hijjah"];
+          const monthIdx = (now.getMonth() + 2) % 12;
+          hijri = `${now.getDate()} ${hijriMonths[monthIdx]} 1448 AH`;
+        }
+      }
+      return { gregorian, hijri };
+    }
+
+    try {
+      const liveDates = getCalculatedDates();
+      const gEl = document.getElementById('liveGregorianHeader');
+      const hEl = document.getElementById('liveHijriHeader');
+      if (gEl) gEl.innerText = liveDates.gregorian;
+      if (hEl) hEl.innerText = liveDates.hijri;
+    } catch (e) {}
+
+    const welcomeMessages = [
+      `Welcome, ${customerFullName} 👋`,
+      'Wallet Status: Active & Secured 🔒',
+      'Instant Auto-Funding Active ⚡',
+      'Earn ₦500 on Each Referral 🎁',
+      'NIMC & NIBSS Verification Active 🆔'
+    ];
+    let welcomeMsgIdx = 0;
+    setInterval(() => {
+      welcomeMsgIdx = (welcomeMsgIdx + 1) % welcomeMessages.length;
+      const el = document.getElementById('dynamicTicker');
+      if (el) el.innerText = welcomeMessages[welcomeMsgIdx];
+    }, 3200);
+
+    function updateOnlineStatus() {
+      const banner = document.getElementById('netStatusBanner');
+      if (!banner) return;
+      if (!navigator.onLine) {
+        banner.className = 'fixed top-0 inset-x-0 z-[100] text-center text-xs font-bold py-1.5 transition-all shadow-md bg-rose-600 text-white';
+        banner.innerHTML = '⚠️ No Internet Connection! Check your network.';
+        banner.classList.remove('hidden');
+      } else {
+        banner.className = 'fixed top-0 inset-x-0 z-[100] text-center text-xs font-bold py-1.5 transition-all shadow-md bg-emerald-600 text-white';
+        banner.innerHTML = '✓ Internet Connection Restored';
+        setTimeout(() => banner.classList.add('hidden'), 2500);
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+
+    const STANDARDIZED_AMOUNTS = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];
+
+    const APP_CONFIG = {
+      data: {
+        title: 'DATA HUB (6 NETWORKS)', step1Title: 'RECIPIENT & NETWORK', inputLabel: 'Recipient Phone Number (11 Digits)', inputPlaceholder: 'Enter 11-digit phone number...',
+        contextType: 'phone', maxLength: 11,
+        autoDetectPrefixes: {
+          MTN: ['0803','0806','0703','0706','0813','0816','0810','0814','0903','0906','0913','0916'],
+          Airtel: ['0802','0808','0708','0812','0701','0902','0901','0904','0907','0912'],
+          Glo: ['0805','0807','0705','0815','0811','0905','0915'],
+          '9mobile': ['0809','0818','0909','0908'],
+          LABARA: ['0819','0709'],
+          VITAL: ['0817','0707']
+        },
+        providers: [
+          { id: 'MTN', name: 'MTN Nigeria', icon: '🟡' }, { id: 'Airtel', name: 'Airtel', icon: '🔴' },
+          { id: 'Glo', name: 'Glo Mobile', icon: '🟢' }, { id: '9mobile', name: '9mobile', icon: '🟢' },
+          { id: 'LABARA', name: 'LABARA', icon: '🟣' }, { id: 'VITAL', name: 'VITAL', icon: '🔵' }
+        ],
+        categories: {
+          MTN: ['MTN SME', 'MTN CG', 'MTN Gifting'], Airtel: ['Airtel CG', 'Airtel SME'],
+          Glo: ['Glo CG', 'Glo Gifting'], '9mobile': ['9mobile SME'],
+          LABARA: ['Labara SME'], VITAL: ['Vital SME']
+        },
+        packages: {
+          'MTN SME': [{ name: '1.0GB', validity: '30 Days', price: 300 }, { name: '2.0GB', validity: '30 Days', price: 600 }, { name: '5.0GB', validity: '30 Days', price: 1500 }],
+          'Airtel CG': [{ name: '1.0GB', validity: '30 Days', price: 275 }, { name: '2.0GB', validity: '30 Days', price: 550 }],
+          'Glo CG': [{ name: '1.0GB', validity: '30 Days', price: 280 }, { name: '2.0GB', validity: '30 Days', price: 560 }],
+          '9mobile SME': [{ name: '1.0GB', validity: '30 Days', price: 290 }, { name: '2.0GB', validity: '30 Days', price: 580 }],
+          'Labara SME': [{ name: '1.0GB', validity: '30 Days', price: 280 }, { name: '2.0GB', validity: '30 Days', price: 560 }],
+          'Vital SME': [{ name: '1.0GB', validity: '30 Days', price: 290 }, { name: '2.0GB', validity: '30 Days', price: 580 }]
+        },
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">DATA BALANCE USSD:</div><div class="text-xs font-black mt-0.5">Dial *323*4# (MTN) or *310# (Airtel)</div>`
+      },
+      airtime: {
+        title: 'AIRTIME VTU', step1Title: 'RECIPIENT & NETWORK', inputLabel: 'Recipient Phone Number (11 Digits)', inputPlaceholder: 'Enter 11-digit phone number...',
+        contextType: 'phone', maxLength: 11,
+        autoDetectPrefixes: {
+          MTN: ['0803','0806','0703','0706','0813','0816','0810','0814','0903','0906','0913','0916'],
+          Airtel: ['0802','0808','0708','0812','0701','0902','0901','0904','0907','0912'],
+          Glo: ['0805','0807','0705','0815','0811','0905','0915'],
+          '9mobile': ['0809','0818','0909','0908'],
+          LABARA: ['0819','0709'],
+          VITAL: ['0817','0707']
+        },
+        providers: [
+          { id: 'MTN', name: 'MTN (2% OFF)', icon: '🟡' }, { id: 'Airtel', name: 'Airtel (2% OFF)', icon: '🔴' },
+          { id: 'Glo', name: 'Glo (2% OFF)', icon: '🟢' }, { id: '9mobile', name: '9mobile (2% OFF)', icon: '🟢' },
+          { id: 'LABARA', name: 'LABARA (2% OFF)', icon: '🟣' }, { id: 'VITAL', name: 'VITAL (2% OFF)', icon: '🔵' }
+        ],
+        isAmountSelectDirect: true, predefinedAmounts: [100, 200, 500, ...STANDARDIZED_AMOUNTS],
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">AIRTIME VTU DELIVERED INSTANTLY ✓</div>`
+      },
+      broadband: {
+        title: 'BROADBAND INTERNET', step1Title: 'ROUTER / SIM NUMBER', inputLabel: 'Router / Device Number', inputPlaceholder: 'Enter router account number...',
+        contextType: 'phone', maxLength: 11,
+        providers: [{ id: 'Smile', name: 'Smile 4G', icon: '📡' }, { id: 'Airtel5G', name: 'Airtel 5G', icon: '📡' }, { id: 'MTN5G', name: 'MTN 5G Router', icon: '📡' }, { id: 'Spectranet', name: 'Spectranet', icon: '📡' }],
+        isAmountSelectDirect: true, predefinedAmounts: STANDARDIZED_AMOUNTS,
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">ROUTER BROADBAND CREDITED ✓</div>`
+      },
+      a2c: {
+        title: 'AIRTIME TO CASH (R2C)', step1Title: 'AIRTIME NETWORK & SENDER', inputLabel: 'Sender Phone Number', inputPlaceholder: 'Enter number with airtime...',
+        contextType: 'phone', maxLength: 11, isA2CMode: true,
+        providers: [
+          { id: 'MTN', name: 'MTN Share (85%)', icon: '🟡', rate: 0.85 },
+          { id: 'Airtel', name: 'Airtel Me2U (80%)', icon: '🔴', rate: 0.80 },
+          { id: 'Glo', name: 'Glo Share (75%)', icon: '🟢', rate: 0.75 },
+          { id: '9mobile', name: '9mobile (75%)', icon: '🟢', rate: 0.75 }
+        ],
+        isAmountSelectDirect: true, predefinedAmounts: STANDARDIZED_AMOUNTS,
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">AIRTIME CONVERTED & CREDITED TO WALLET ✓</div>`
+      },
+      betting: {
+        title: 'BETTING HUB (WALLET TOP-UP)', step1Title: 'CUSTOMER ID & PLATFORM', inputLabel: 'Betting User ID / Account', inputPlaceholder: 'Enter betting user ID...',
+        contextType: 'account', maxLength: 12, hasAccountVerification: true,
+        providers: [
+          { id: 'SportyBet', name: 'SportyBet', icon: '⚽' }, { id: 'Bet9ja', name: 'Bet9ja', icon: '⚽' },
+          { id: '1xBet', name: '1xBet', icon: '⚽' }, { id: 'MSport', name: 'MSport', icon: '⚽' },
+          { id: 'BetKing', name: 'BetKing', icon: '⚽' }, { id: 'BangBet', name: 'BangBet', icon: '⚽' },
+          { id: 'PariPesa', name: 'PariPesa', icon: '⚽' }, { id: 'Merrybet', name: 'Merrybet', icon: '⚽' }
+        ],
+        isAmountSelectDirect: true, predefinedAmounts: [500, ...STANDARDIZED_AMOUNTS],
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">BETTING ACCOUNT CREDITED INSTANTLY ✓</div>`
+      },
+      electricity: {
+        title: 'ELECTRICITY TOKENS', step1Title: 'METER & DISCO', inputLabel: 'Meter Number (11-13 Digits)', inputPlaceholder: 'Enter meter number...',
+        contextType: 'meter', maxLength: 13,
+        providers: [{ id: 'KEDCO', name: 'KEDCO (Kano)', icon: '⚡' }, { id: 'AEDC', name: 'AEDC (Abuja)', icon: '⚡' }, { id: 'KAEDCO', name: 'KAEDCO (Kaduna)', icon: '⚡' }, { id: 'IBEDC', name: 'IBEDC (Ibadan)', icon: '⚡' }],
+        isAmountSelectDirect: true, predefinedAmounts: STANDARDIZED_AMOUNTS,
+        receiptSpecial: () => {
+          const fakeToken = `${Math.floor(1000+Math.random()*9000)}-${Math.floor(1000+Math.random()*9000)}-${Math.floor(1000+Math.random()*9000)}-${Math.floor(1000+Math.random()*9000)}`;
+          return `<div class="text-[10px] text-emerald-800 font-bold">20-DIGIT POWER TOKEN:</div><div class="text-sm font-black tracking-widest text-[#006B3C]">${fakeToken}</div><button onclick="copyToClipboard('${fakeToken}', 'Token')" class="mt-1 px-3 py-1 bg-[#006B3C] text-white rounded text-[10px] font-bold">COPY TOKEN</button>`;
+        }
+      },
+      cable: {
+        title: 'CABLE TV', step1Title: 'SMARTCARD & PROVIDER', inputLabel: 'IUC / SmartCard Number', inputPlaceholder: 'Enter IUC number...',
+        contextType: 'cable', maxLength: 11, hasAccountVerification: true,
+        providers: [{ id: 'DStv', name: 'DStv', icon: '📺' }, { id: 'GOtv', name: 'GOtv', icon: '📺' }, { id: 'StarTimes', name: 'StarTimes', icon: '📺' }],
+        isAmountSelectDirect: true, predefinedAmounts: [3500, 5000, 9000, 14500],
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">CABLE PACKAGE RENEWED SUCCESSFULLY ✓</div>`
+      },
+      transfer: {
+        title: 'BANK TRANSFER', step1Title: 'ACCOUNT & BANK', inputLabel: 'Account Number (10 Digits)', inputPlaceholder: 'Enter 10-digit account number...',
+        contextType: 'account', maxLength: 10, hasAccountVerification: true,
+        providers: [{ id: 'PalmPay', name: 'PalmPay', icon: '🏦' }, { id: 'OPay', name: 'OPay Digital', icon: '🏦' }, { id: 'Moniepoint', name: 'Moniepoint', icon: '🏦' }, { id: 'Kuda', name: 'Kuda MFB', icon: '🏦' }, { id: 'FCMB', name: 'FCMB Bank', icon: '🏦' }, { id: 'GTB', name: 'GTBank', icon: '🏦' }],
+        isAmountSelectDirect: true, predefinedAmounts: STANDARDIZED_AMOUNTS,
+        receiptSpecial: () => `<div class="text-[10px] text-emerald-800 font-bold">NIP INSTANT TRANSFER SETTLED ✓</div>`
+      },
+      nin_slip: {
+        title: 'NIN SLIPS PORTAL', step1Title: 'NIN NUMBER & FORMAT', inputLabel: 'NIN Number (11 Digits)', inputPlaceholder: 'Enter 11-digit NIN...',
+        contextType: 'nin', maxLength: 11, isIdentitySlipMode: true,
+        providers: [{ id: 'Standard', name: 'Standard Slip (₦100)', icon: '📄', price: 100 }, { id: 'Premium', name: 'Premium Plastic (₦300)', icon: '💳', price: 300 }]
+      },
+      bvn_slip: {
+        title: 'BVN SLIPS PORTAL', step1Title: 'BVN NUMBER & FORMAT', inputLabel: 'BVN Number (11 Digits)', inputPlaceholder: 'Enter 11-digit BVN...',
+        contextType: 'bvn', maxLength: 11, isIdentitySlipMode: true,
+        providers: [{ id: 'Standard', name: 'Standard Slip (₦100)', icon: '📄', price: 100 }, { id: 'Premium', name: 'Premium Plastic (₦300)', icon: '💳', price: 300 }]
+      },
+      nin_mod: {
+        title: 'NIN MODIFICATION', step1Title: 'NIN & MODIFICATION CATEGORY', inputLabel: 'NIN Number (11 Digits)', inputPlaceholder: 'Enter 11-digit NIN...',
+        contextType: 'nin', maxLength: 11, isModificationMode: true, modFee: 2500
+      },
+      bvn_mod: {
+        title: 'BVN MODIFICATION', step1Title: 'BVN & MODIFICATION CATEGORY', inputLabel: 'BVN Number (11 Digits)', inputPlaceholder: 'Enter 11-digit BVN...',
+        contextType: 'bvn', maxLength: 11, isModificationMode: true, modFee: 2500
+      },
+      exam_pin: {
+        title: 'EXAM SCRATCH CARD / TOKEN', step1Title: 'CANDIDATE PHONE & EXAM BODY', inputLabel: 'Buyer Phone Number',
+        isExamPin: true
+      }
+    };
+
+    let activeServiceKey = 'data';
+    let flowState = { target: '', provider: '', category: '', package: null };
+
+    function openAppService(serviceKey) {
+      activeServiceKey = serviceKey;
+      const bp = APP_CONFIG[serviceKey] || APP_CONFIG.data;
+
+      const inEl = document.getElementById('uServiceInput');
+      if (inEl) { inEl.placeholder = bp.inputPlaceholder; inEl.value = ''; }
+      const customInp = document.getElementById('uCustomAmountInput');
+      if (customInp) customInp.value = '';
+
+      document.getElementById('uModalTitle').innerText = bp.title;
+      document.getElementById('uStep1TitleText').innerText = bp.step1Title;
+      document.getElementById('uInputBoxLabel').innerText = bp.inputLabel;
+      document.getElementById('liveNetBadge')?.classList.add('hidden');
+      document.getElementById('uVerifiedNameTag')?.classList.add('hidden');
+
+      const s2Badge = document.getElementById('uStep2SummaryBadge');
+      if (s2Badge) s2Badge.innerText = 'Pending';
+      const s2Title = document.getElementById('uStep2TitleText');
+      if (s2Title) s2Title.innerText = bp.isAmountSelectDirect ? 'AMOUNT SELECT' : (serviceKey === 'data' ? 'DATA CATEGORY' : bp.title);
+
+      const ussdBox = document.getElementById('ussdHelperBox');
+      if (ussdBox) ussdBox.classList.toggle('hidden', serviceKey !== 'data' && serviceKey !== 'airtime');
+
+      const a2cBox = document.getElementById('a2cCalcBox');
+      if (a2cBox) a2cBox.classList.toggle('hidden', !bp.isA2CMode);
+
+      const modWrap = document.getElementById('uModFieldsWrap');
+      const provSection = document.getElementById('uProvidersSection');
+      if (bp.isModificationMode) {
+        if (provSection) provSection.classList.add('hidden');
+        if (modWrap) modWrap.classList.remove('hidden');
+        renderModificationInputs();
+      } else {
+        if (provSection) provSection.classList.remove('hidden');
+        if (modWrap) modWrap.classList.add('hidden');
+      }
+
+      const pGrid = document.getElementById('uProvidersListGrid');
+      if (pGrid) {
+        pGrid.innerHTML = '';
+        if (bp.providers) {
+          bp.providers.forEach(p => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.id = `btnProv-${p.id}`;
+            btn.className = 'u-prov-item p-2 rounded-xl border border-slate-200 flex flex-col items-center gap-1 active:scale-95 transition';
+            btn.innerHTML = `<span class="text-base">${p.icon}</span><span class="text-[10px] font-black">${p.name}</span>`;
+            btn.onclick = () => selectFlowProvider(p.id);
+            pGrid.appendChild(btn);
+          });
+          selectFlowProvider(bp.providers[0].id);
+        }
+      }
+
+      expandFlowStep(1);
+      openModal('universalServiceModal');
+      safeCreateIcons();
+    }
+
+    function selectFlowProvider(provId) {
+      flowState.provider = provId;
+      document.querySelectorAll('.u-prov-item').forEach(b => b.classList.remove('border-2', 'border-[#006B3C]', 'bg-emerald-50'));
+      const act = document.getElementById(`btnProv-${provId}`);
+      if (act) act.classList.add('border-2', 'border-[#006B3C]', 'bg-emerald-50');
+
+      if (activeServiceKey === 'a2c') {
+        const bp = APP_CONFIG.a2c;
+        const pObj = bp.providers.find(p => p.id === provId);
+        if (pObj) {
+          document.getElementById('a2cRateText').innerText = `${Math.round(pObj.rate * 100)}% Return`;
+          updateA2CLiveCredit();
+        }
+      }
+    }
+
+    function updateA2CLiveCredit(amount = 0) {
+      if (activeServiceKey !== 'a2c') return;
+      const bp = APP_CONFIG.a2c;
+      const pObj = bp.providers.find(p => p.id === flowState.provider) || bp.providers[0];
+      const credit = amount * pObj.rate;
+      document.getElementById('a2cCreditText').innerText = `₦${credit.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    }
+
+    function handleCustomAmountType(val) {
+      const amt = parseFloat(val) || 0;
+      if (activeServiceKey === 'a2c') updateA2CLiveCredit(amt);
+    }
+
+    function handleUniversalInput(val) {
+      const bp = APP_CONFIG[activeServiceKey] || APP_CONFIG.data;
+      const maxLen = bp.maxLength || 11;
+      let clean = val.replace(/[^0-9]/g, '').slice(0, maxLen);
+      const inEl = document.getElementById('uServiceInput');
+      if (inEl) inEl.value = clean;
+      const netBadge = document.getElementById('liveNetBadge');
+
+      if (bp.autoDetectPrefixes && clean.length >= 4) {
+        const p4 = clean.substring(0, 4);
+        let detected = false;
+        for (const [netId, prefixes] of Object.entries(bp.autoDetectPrefixes)) {
+          if (prefixes.includes(p4)) {
+            selectFlowProvider(netId);
+            detected = true;
+            if (netBadge) {
+              netBadge.classList.remove('hidden');
+              netBadge.className = 'text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 shadow-sm';
+              netBadge.innerText = `${netId} Active`;
+            }
+            break;
+          }
+        }
+        if (!detected && netBadge) netBadge.classList.add('hidden');
+      }
+
+      if (bp.hasAccountVerification && clean.length >= 6) {
+        document.getElementById('uVerifiedNameTag')?.classList.remove('hidden');
+        if (activeServiceKey === 'betting') {
+          document.getElementById('uVerifiedNameText').innerText = `BELLO J. (${flowState.provider || 'Betting'} Verified ✓)`;
+        } else {
+          document.getElementById('uVerifiedNameText').innerText = `BELLO JAMILU (${flowState.provider || 'Bank'} Verified ✓)`;
+        }
+      }
+
+      if ((activeServiceKey === 'data' || activeServiceKey === 'airtime') && clean.length === 11) {
+        setTimeout(proceedFromStep1, 250);
+      }
+    }
+
+    function expandFlowStep(stepNum) {
+      document.getElementById('uStep1Body')?.classList.toggle('hidden', stepNum !== 1);
+      document.getElementById('uStep2Body')?.classList.toggle('hidden', stepNum !== 2);
+      document.getElementById('uStep1SummaryBadge')?.classList.toggle('hidden', stepNum === 1);
+      safeCreateIcons();
+    }
+
+    function renderModificationInputs() {
+      const cat = document.getElementById('uModCategorySelect')?.value;
+      const wrap = document.getElementById('uDynamicModInputsContainer');
+      if (!wrap) return;
+      wrap.innerHTML = (cat === 'dob') 
+        ? `<div><label class="block text-[10px] font-bold text-slate-400 uppercase">Old Date of Birth</label><input type="date" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold" /></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase">New Date of Birth</label><input type="date" class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold" /></div>`
+        : `<div><label class="block text-[10px] font-bold text-slate-400 uppercase">Old ${cat.toUpperCase()}</label><input type="text" placeholder="Enter old ${cat}..." class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold" /></div><div><label class="block text-[10px] font-bold text-slate-400 uppercase">New ${cat.toUpperCase()}</label><input type="text" placeholder="Enter new ${cat}..." class="w-full bg-slate-50 border rounded-xl px-3 py-2 text-xs font-bold" /></div>`;
+    }
+
+    function handleModDocAttached(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('docUploadLabel').innerText = file.name.substring(0, 10) + '... ✓';
+        showToast('✓ Supporting Document Attached!');
+      }
+    }
+
+    function handleModPhotoAttached(e) {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('photoUploadLabel').innerText = 'Photo Attached ✓';
+        showToast('✓ Personal Photo Attached!');
+      }
+    }
+
+    function proceedFromStep1() {
+      const val = document.getElementById('uServiceInput')?.value.trim();
+      if (!val || val.length < 5) return showToast('⚠️ Enter valid recipient phone or ID number!');
+      flowState.target = val;
+      const bp = APP_CONFIG[activeServiceKey] || APP_CONFIG.data;
+
+      if (bp.isModificationMode) {
+        flowState.package = { name: 'Modification Processing Fee', price: bp.modFee || 2500 };
+        openConfirmPurchaseModal('NIN/BVN Modification Processing', bp.modFee || 2500);
+        return;
+      }
+
+      if (bp.isIdentitySlipMode) {
+        setupDirectPricedPackages();
+      } else if (bp.isAmountSelectDirect) {
+        setupAmountSelectPage();
+      } else {
+        setupDataCategoryPage();
+      }
+
+      expandFlowStep(2);
+      const sBadge = document.getElementById('uStep1SummaryBadge');
+      if (sBadge) sBadge.innerText = `${flowState.provider || 'Verified'} • ${flowState.target}`;
+    }
+
+    function setupDataCategoryPage() {
+      const bp = APP_CONFIG.data;
+      document.getElementById('uCustomAmountWrap')?.classList.add('hidden');
+      document.getElementById('uCategoryTabsWrap')?.classList.remove('hidden');
+
+      const cats = (bp.categories && bp.categories[flowState.provider]) || ['MTN SME'];
+      flowState.category = cats[0];
+      const pillsWrap = document.getElementById('uCategoryPillsWrap');
+      if (pillsWrap) {
+        pillsWrap.innerHTML = '';
+        cats.forEach((cat, idx) => {
+          const pBtn = document.createElement('button');
+          pBtn.className = `px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition ${idx === 0 ? 'bg-[#006B3C] text-white shadow' : 'bg-slate-100 text-slate-700'}`;
+          pBtn.innerText = cat;
+          pBtn.onclick = () => {
+            document.querySelectorAll('#uCategoryPillsWrap button').forEach(b => {
+              b.className = 'px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition bg-slate-100 text-slate-700';
+            });
+            pBtn.className = 'px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition bg-[#006B3C] text-white shadow';
+            flowState.category = cat;
+            renderDataOpayTiles();
+          };
+          pillsWrap.appendChild(pBtn);
+        });
+      }
+      renderDataOpayTiles();
+    }
+
+    function renderDataOpayTiles(filter = '') {
+      const grid = document.getElementById('uPackagesGridContainer');
+      if (!grid) return;
+      grid.innerHTML = '';
+      const bp = APP_CONFIG.data;
+      const pkgs = (bp.packages && (bp.packages[flowState.category] || Object.values(bp.packages)[0])) || [];
+      const filtered = pkgs.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()) || p.price.toString().includes(filter));
+
+      filtered.forEach(pkg => {
+        const tile = document.createElement('div');
+        tile.className = 'opay-tile p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 flex flex-col justify-between cursor-pointer hover:border-[#006B3C] shadow-sm';
+        tile.innerHTML = `
+          <div><div class="text-base font-black tracking-tight">${pkg.name}</div><div class="text-[10px] text-emerald-700 font-bold mt-0.5">${pkg.validity}</div></div>
+          <div class="mt-3 flex items-baseline justify-between pt-1 border-t"><span class="text-sm font-black">₦${pkg.price.toFixed(0)}</span><span class="text-[9px] bg-[#006B3C] text-white px-2 py-0.5 rounded font-black">SELECT</span></div>
+        `;
+        tile.onclick = () => { flowState.package = pkg; openConfirmPurchaseModal(pkg.name, pkg.price); };
+        grid.appendChild(tile);
+      });
+    }
+
+    function setupAmountSelectPage() {
+      document.getElementById('uCategoryTabsWrap')?.classList.add('hidden');
+      document.getElementById('uCustomAmountWrap')?.classList.remove('hidden');
+
+      const bp = APP_CONFIG[activeServiceKey] || APP_CONFIG.airtime;
+      const grid = document.getElementById('uPackagesGridContainer');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      bp.predefinedAmounts.forEach(amt => {
+        const chip = document.createElement('div');
+        chip.className = 'opay-tile p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 text-center cursor-pointer hover:border-[#006B3C] active:scale-95 shadow-sm';
+        chip.innerHTML = `<div class="text-sm font-black">₦${amt.toLocaleString()}</div><div class="text-[9px] text-emerald-700 font-bold mt-0.5">Select</div>`;
+        chip.onclick = () => {
+          let finalPrice = amt;
+          let label = `Top-up ₦${amt.toLocaleString()}`;
+          if (activeServiceKey === 'a2c') {
+            const pObj = bp.providers.find(p => p.id === flowState.provider) || bp.providers[0];
+            const returnAmt = amt * pObj.rate;
+            label = `Convert ₦${amt.toLocaleString()} Airtime -> Receive ₦${returnAmt.toLocaleString()}`;
+            finalPrice = amt;
+            updateA2CLiveCredit(amt);
+          }
+          flowState.package = { name: label, price: finalPrice };
+          openConfirmPurchaseModal(label, finalPrice);
+        };
+        grid.appendChild(chip);
+      });
+    }
+
+    function setupDirectPricedPackages() {
+      document.getElementById('uCategoryTabsWrap')?.classList.add('hidden');
+      document.getElementById('uCustomAmountWrap')?.classList.add('hidden');
+
+      const bp = APP_CONFIG[activeServiceKey];
+      const grid = document.getElementById('uPackagesGridContainer');
+      if (!grid || !bp || !bp.providers) return;
+      grid.innerHTML = '';
+      bp.providers.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'opay-tile p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 flex flex-col justify-between cursor-pointer hover:border-[#006B3C] shadow-sm';
+        item.innerHTML = `<div class="text-xl mb-1">${p.icon}</div><div class="text-xs font-black">${p.name}</div><div class="mt-2 text-sm font-black text-emerald-700">₦${p.price.toLocaleString()}</div>`;
+        item.onclick = () => { flowState.package = { name: p.name, price: p.price }; openConfirmPurchaseModal(p.name, p.price); };
+        grid.appendChild(item);
+      });
+    }
+
+    function handleCustomAmountContinue() {
+      const inputEl = document.getElementById('uCustomAmountInput');
+      const val = inputEl ? parseFloat(inputEl.value) : 0;
+      if (!val || val <= 0) return showToast('⚠️ Enter valid amount!');
+      flowState.package = { name: `Custom ₦${val.toLocaleString()}`, price: val };
+      openConfirmPurchaseModal(`Custom ₦${val.toLocaleString()}`, val);
+    }
+
+    function filterDynamicCategories(val) {
+      if (activeServiceKey === 'data') renderDataOpayTiles(val);
+    }
+
+    // AUTOMATIC BIOMETRIC POPUP FLOW ON PURCHASE CONFIRM
+    function openConfirmPurchaseModal(pkgName, price) {
+      if (activeServiceKey !== 'a2c' && price > currentBalance) {
+        return showToast('⚠️ Insufficient Wallet Balance! Please fund your wallet.');
+      }
+      const bp = APP_CONFIG[activeServiceKey] || APP_CONFIG.data;
+      document.getElementById('confServiceName').innerText = bp.title;
+      document.getElementById('confNet').innerText = flowState.provider || 'Verified Gateway';
+      document.getElementById('confPhone').innerText = flowState.target;
+      document.getElementById('confPlanName').innerText = pkgName;
+      document.getElementById('confPrice').innerText = `₦${price.toLocaleString()}`;
+      
+      const pinEl = document.getElementById('orderPin');
+      if (pinEl) pinEl.value = '';
+
+      openModal('dataConfirmModal');
+
+      // Check if Biometric Transaction is enabled (Default is enabled)
+      const isBioTxEnabled = localStorage.getItem('qudsiyyasub_bio_tx') !== 'false';
+      if (isBioTxEnabled) {
+        setTimeout(() => {
+          triggerBiometricPurchase();
+        }, 280);
+      }
+    }
+
+    // BIOMETRIC SENSOR MODAL & TOUCH EVENT
+    let pendingBiometricPurpose = 'PAYMENT';
+
+    function triggerBiometricPurchase() {
+      pendingBiometricPurpose = 'PAYMENT';
+      document.getElementById('bioModalTitle').innerText = 'Authorize Transaction';
+      document.getElementById('bioModalSubtitle').innerText = `Scan fingerprint to authorize ₦${flowState.package?.price?.toLocaleString() || '0.00'}`;
+      document.getElementById('bioSensorStatusText').innerText = 'Touch sensor with registered finger...';
+      openModal('biometricSensorModal');
+      triggerHapticVibrate([30, 40]);
+    }
+
+    function triggerBiometricLogin() {
+      pendingBiometricPurpose = 'LOGIN';
+      document.getElementById('bioModalTitle').innerText = 'Quick Biometric Sign In';
+      document.getElementById('bioModalSubtitle').innerText = 'Verify identity to sign in to QudsiyyaSub';
+      document.getElementById('bioSensorStatusText').innerText = 'Touch sensor with registered finger...';
+      openModal('biometricSensorModal');
+      triggerHapticVibrate([30, 40]);
+    }
+
+    function confirmBiometricSensorTouch() {
+      const statusText = document.getElementById('bioSensorStatusText');
+      const circle = document.getElementById('bioSensorCircle');
+      if (statusText) statusText.innerText = 'Scanning fingerprint pattern...';
+      if (circle) circle.classList.add('scale-105', 'border-solid');
+      triggerHapticVibrate([50, 70, 50]);
+
+      setTimeout(() => {
+        closeModal('biometricSensorModal');
+        if (circle) circle.classList.remove('scale-105', 'border-solid');
+
+        if (pendingBiometricPurpose === 'LOGIN') {
+          localStorage.setItem('qudsiyyasub_logged_in', 'true');
+          showAppScreen('screen-dashboard');
+          playFintechSuccessSound();
+          showToast(`✓ Welcome back, ${customerFullName}! Authenticated via Biometrics.`);
+        } else {
+          executeEnginePurchase('FINGERPRINT');
+        }
+      }, 700);
+    }
+
+    function cancelBiometricSensor() {
+      closeModal('biometricSensorModal');
+      showToast('Biometric authorization cancelled. Enter 4-digit PIN below:');
+      const pinField = document.getElementById('orderPin');
+      if (pinField) pinField.focus();
+    }
+
+    function triggerHapticVibrate(pattern) {
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate(pattern); } catch (e) {}
+      }
+    }
+
+    function toggleBioSetting(el, type) {
+      if (type === 'TX') {
+        localStorage.setItem('qudsiyyasub_bio_tx', el.checked ? 'true' : 'false');
+        showToast(el.checked ? '✓ Automatic Biometric payment enabled!' : 'Biometric payment disabled. PIN required.');
+      } else {
+        localStorage.setItem('qudsiyyasub_bio_login', el.checked ? 'true' : 'false');
+        showToast(el.checked ? '✓ Biometric Sign In enabled!' : 'Biometric Sign In disabled.');
+      }
+    }
+
+    // FORGOT / RESET PIN WORKFLOW
+    function openForgotPinModal(source = 'fromSettings') {
+      forgotPinTriggerSource = source;
+      document.getElementById('fPinPhoneVal').value = savedPhone || '08012345678';
+      document.getElementById('fPinOtpInput').value = '';
+      document.getElementById('fPinNew1').value = '';
+      document.getElementById('fPinNew2').value = '';
+      advanceForgotPinStep(1);
+      openModal('forgotPinFlowModal');
+    }
+
+    function advanceForgotPinStep(step) {
+      document.getElementById('fPinStep1')?.classList.toggle('hidden', step !== 1);
+      document.getElementById('fPinStep2')?.classList.toggle('hidden', step !== 2);
+      document.getElementById('fPinStep3')?.classList.toggle('hidden', step !== 3);
+
+      if (step === 2) {
+        const phone = document.getElementById('fPinPhoneVal')?.value.trim();
+        if (!phone || phone.length < 10) return showToast('⚠️ Enter valid phone number!');
+        document.getElementById('fPinTargetPhoneText').innerText = phone;
+        showToast('✓ 6-Digit PIN Reset Code sent to your phone!');
+      } else if (step === 3) {
+        const otp = document.getElementById('fPinOtpInput')?.value.trim();
+        if (!otp || otp.length < 4) return showToast('⚠️ Enter valid 6-digit OTP code!');
+        showToast('✓ Reset OTP Code Verified!');
+      }
+    }
+
+    function finalizeForgotPinReset() {
+      const p1 = document.getElementById('fPinNew1')?.value.trim();
+      const p2 = document.getElementById('fPinNew2')?.value.trim();
+
+      if (!p1 || p1.length !== 4) return showToast('⚠️ New PIN must be exactly 4 digits!');
+      if (p1 !== p2) return showToast('⚠️ Security PINs do not match!');
+
+      customerPin = p1;
+      localStorage.setItem('qudsiyyasub_user_pin', customerPin);
+      closeModal('forgotPinFlowModal');
+      playFintechSuccessSound();
+      showToast('✓ Security PIN reset successfully! You can now use your new PIN.');
+
+      if (forgotPinTriggerSource === 'fromPayment') {
+        const pinInp = document.getElementById('orderPin');
+        if (pinInp) {
+          pinInp.value = customerPin;
+          showToast('New PIN pre-filled. Tap PAY WITH PIN.');
+        }
+      }
+    }
+
+    function executeEnginePurchase(authMethod = 'PIN') {
+      const pinEl = document.getElementById('orderPin');
+      const enteredPin = pinEl ? pinEl.value.trim() : '';
+
+      if (authMethod === 'PIN') {
+        if (!enteredPin || enteredPin.length !== 4) {
+          return showToast('⚠️ Enter your 4-digit PIN!');
+        }
+        if (enteredPin !== customerPin) {
+          return showToast('❌ Incorrect PIN! Try again or tap "Forgot PIN?".');
+        }
+      }
+
+      if (pinEl) pinEl.value = '';
+
+      const cost = flowState.package.price;
+
+      if (activeServiceKey === 'a2c') {
+        const bp = APP_CONFIG.a2c;
+        const pObj = bp.providers.find(p => p.id === flowState.provider) || bp.providers[0];
+        const gain = cost * pObj.rate;
+        currentBalance += gain;
+        showToast(`✓ Airtime converted! +₦${gain.toLocaleString()} credited to wallet.`);
+      } else {
+        currentBalance -= cost;
+      }
+
+      localStorage.setItem('qudsiyyasub_balance', currentBalance);
+      document.getElementById('balanceDisplay').innerText = `₦${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+      document.getElementById('profileWalletDisplay').innerText = `₦${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+
+      closeModal('dataConfirmModal');
+      closeModal('universalServiceModal');
+      closeModal('examPinModal');
+
+      const refId = 'QDS-' + Math.floor(1000000 + Math.random() * 9000000);
+      const txObj = {
+        id: refId,
+        service: `${flowState.provider || ''} ${flowState.package.name}`,
+        type: activeServiceKey,
+        target: flowState.target,
+        amount: flowState.package.price,
+        date: 'Just Now',
+        status: activeServiceKey === 'a2c' ? 'Credit' : 'Success'
+      };
+      transactionsHistory.unshift(txObj);
+      localStorage.setItem('qudsiyyasub_txs', JSON.stringify(transactionsHistory));
+      renderRecentTransactions();
+
+      const bp = APP_CONFIG[activeServiceKey];
+      if (bp && bp.isIdentitySlipMode) {
+        showToast('Connecting to NIMC/NIBSS Portal...');
+        setTimeout(() => {
+          openIdentitySlipModal();
+        }, 1200);
+        return;
+      }
+
+      playFintechSuccessSound();
+      openStandardDebitReceipt(refId);
+    }
+
+    function openStandardDebitReceipt(refId) {
+      const dates = getCalculatedDates();
+      refId = refId || ('QDS-' + Math.floor(1000000 + Math.random() * 9000000));
+
+      document.getElementById('dRecAmount').innerText = `₦${flowState.package.price.toLocaleString()}`;
+      document.getElementById('dRecPlan').innerText = `${flowState.provider || ''} ${flowState.package.name}`;
+      document.getElementById('dRecRef').innerText = refId;
+      document.getElementById('dRecPhone').innerText = flowState.target;
+      document.getElementById('dRecNet').innerText = flowState.provider || 'Automated Provider';
+      document.getElementById('dRecGregorian').innerText = dates.gregorian;
+      document.getElementById('dRecHijri').innerText = dates.hijri;
+
+      const bp = APP_CONFIG[activeServiceKey];
+      const spWrap = document.getElementById('dRecSpecialContainer');
+      if (spWrap) {
+        if (flowState.isExamPin) {
+          const fakePin = `${Math.floor(1000+Math.random()*9000)}-${Math.floor(1000+Math.random()*9000)}-${Math.floor(1000+Math.random()*9000)}`;
+          const fakeSerial = `SER${Math.floor(100000000+Math.random()*900000000)}`;
+          spWrap.innerHTML = `<div class="text-[10px] text-emerald-800 font-bold">EXAMINATION SCRATCH PIN:</div><div class="text-sm font-black tracking-widest text-[#006B3C]">${fakePin}</div><div class="text-[10px] text-slate-500 font-bold">SERIAL: ${fakeSerial}</div><button onclick="copyToClipboard('${fakePin}', 'Exam PIN')" class="mt-1 px-3 py-0.5 bg-[#006B3C] text-white rounded text-[10px]">COPY PIN</button>`;
+        } else {
+          spWrap.innerHTML = bp?.receiptSpecial ? bp.receiptSpecial() : `<span class="text-xs font-bold text-emerald-800">AUTOMATED DELIVERY COMPLETED ✓</span>`;
+        }
+      }
+
+      openModal('dataReceiptModal');
+      showToast('✓ Transaction Successful!');
+    }
+
+    function renderRecentTransactions() {
+      const list = document.getElementById('recentTxList');
+      if (!list) return;
+      list.innerHTML = '';
+      transactionsHistory.slice(0, 3).forEach(tx => {
+        const item = document.createElement('div');
+        item.className = 'flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-[#00170c] border border-slate-100 dark:border-emerald-800/40 cursor-pointer';
+        item.onclick = () => openSpecificReceipt(tx);
+        item.innerHTML = `
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-[#A8E600] flex items-center justify-center font-bold text-xs">✓</div>
+            <div><div class="text-[10px] font-bold text-slate-800 dark:text-slate-200">${tx.service}</div><div class="text-[8.5px] text-slate-400">${tx.target} • ${tx.date}</div></div>
+          </div>
+          <div class="text-right text-[10px] font-black ${tx.status === 'Credit' ? 'text-emerald-700' : 'text-slate-900 dark:text-white'}">${tx.status === 'Credit' ? '+' : '-'}₦${tx.amount.toFixed(0)}</div>
+        `;
+        list.appendChild(item);
+      });
+    }
+    renderRecentTransactions();
+
+    function openSpecificReceipt(tx) {
+      const dates = getCalculatedDates();
+      document.getElementById('dRecAmount').innerText = `₦${tx.amount.toFixed(0)}`;
+      document.getElementById('dRecPlan').innerText = tx.service;
+      document.getElementById('dRecRef').innerText = tx.id;
+      document.getElementById('dRecPhone').innerText = tx.target;
+      document.getElementById('dRecNet').innerText = 'Verified Gateway';
+      document.getElementById('dRecGregorian').innerText = dates.gregorian;
+      document.getElementById('dRecHijri').innerText = dates.hijri;
+      openModal('dataReceiptModal');
+    }
+
+    function openIdentitySlipModal() {
+      const isNin = activeServiceKey === 'nin_slip';
+      document.getElementById('slipHeaderBadgeTitle').innerText = isNin ? 'FEDERAL REPUBLIC OF NIGERIA' : 'NIBSS BVN VERIFICATION PORTAL';
+      document.getElementById('slipCardSub').innerText = isNin ? 'NATIONAL IDENTITY MANAGEMENT COMMISSION' : 'NIGERIA INTER-BANK SETTLEMENT SYSTEM';
+      document.getElementById('slipIdLabel').innerText = isNin ? 'NATIONAL IDENTITY NUMBER (NIN)' : 'BANK VERIFICATION NUMBER (BVN)';
+      document.getElementById('slipIdNumber').innerText = flowState.target;
+      document.getElementById('slipHolderName').innerText = customerFullName.toUpperCase();
+      openModal('idSlipPreviewModal');
+      showToast('✓ Identity Record Verified & Retrieved!');
+    }
+
+    function openDebitReceiptAfterSlip() {
+      closeModal('idSlipPreviewModal');
+      openStandardDebitReceipt();
+    }
+
+    let selectedExamBody = 'WAEC';
+    let selectedExamUnitPrice = 3800;
+    let selectedExamQty = 1;
+
+    function openExamPinModal() {
+      document.getElementById('examPinBuyerPhone').value = '';
+      selectExamBodyForPin('WAEC', 3800);
+      advanceExamPinStep(1);
+      openModal('examPinModal');
+    }
+
+    function selectExamBodyForPin(body, unitPrice) {
+      selectedExamBody = body;
+      selectedExamUnitPrice = unitPrice;
+      document.querySelectorAll('.exam-body-btn').forEach(b => b.classList.remove('border-2', 'border-[#006B3C]', 'bg-emerald-50'));
+      document.getElementById(`epb-${body}`)?.classList.add('border-2', 'border-[#006B3C]', 'bg-emerald-50');
+    }
+
+    function advanceExamPinStep(step) {
+      if (step === 2) {
+        const phone = document.getElementById('examPinBuyerPhone')?.value.trim();
+        if (!phone || phone.length < 11) return showToast('⚠️ Enter 11-digit buyer phone number!');
+        document.getElementById('epSelectedBodyText').innerText = `${selectedExamBody} Scratch Card / Token`;
+        setExamPinQty(1);
+        document.getElementById('examPinStep1').classList.add('hidden');
+        document.getElementById('examPinStep2').classList.remove('hidden');
+      } else {
+        document.getElementById('examPinStep2').classList.add('hidden');
+        document.getElementById('examPinStep1').classList.remove('hidden');
+      }
+    }
+
+    function setExamPinQty(qty) {
+      selectedExamQty = qty;
+      document.querySelectorAll('.ep-qty-btn').forEach(b => {
+        b.className = (parseInt(b.innerText) === qty) ? 'ep-qty-btn p-2 rounded-xl border bg-slate-50 border-[#006B3C] text-[#006B3C]' : 'ep-qty-btn p-2 rounded-xl border bg-slate-50';
+      });
+      const total = selectedExamUnitPrice * qty;
+      document.getElementById('epTotalCostText').innerText = `₦${total.toLocaleString()}.00`;
+    }
+
+    function proceedToPayExamPin() {
+      const phone = document.getElementById('examPinBuyerPhone').value.trim();
+      const total = selectedExamUnitPrice * selectedExamQty;
+      activeServiceKey = 'exam_pin';
+      flowState = {
+        target: phone,
+        provider: selectedExamBody,
+        package: { name: `${selectedExamBody} Scratch PIN (${selectedExamQty} PIN${selectedExamQty>1?'s':''})`, price: total },
+        isExamPin: true
+      };
+      closeModal('examPinModal');
+      openConfirmPurchaseModal(flowState.package.name, total);
+    }
+
+    let selectedResultBody = 'WAEC';
+    function openExamResultModal() {
+      document.getElementById('resExamNumberInput').value = '';
+      document.getElementById('resCandNameVal').value = '';
+      document.getElementById('resPinVal').value = '';
+      selectResultExamBody('WAEC');
+      advanceResultStep(1);
+      openModal('examResultFlowModal');
+    }
+
+    function selectResultExamBody(body) {
+      selectedResultBody = body;
+      document.querySelectorAll('.res-body-btn').forEach(b => {
+        b.className = b.innerText.includes(body) ? 'res-body-btn p-3 border rounded-xl bg-slate-50 border-blue-600 text-blue-700' : 'res-body-btn p-3 border rounded-xl bg-slate-50';
+      });
+    }
+
+    function advanceResultStep(step) {
+      if (step === 2) {
+        const no = document.getElementById('resExamNumberInput')?.value.trim();
+        if (!no || no.length < 5) return showToast('⚠️ Enter candidate examination number!');
+        document.getElementById('resStep1').classList.add('hidden');
+        document.getElementById('resStep2').classList.remove('hidden');
+      } else {
+        document.getElementById('resStep2').classList.add('hidden');
+        document.getElementById('resStep1').classList.remove('hidden');
+      }
+    }
+
+    function proceedToAuthorizeResultCheck() {
+      const name = document.getElementById('resCandNameVal')?.value.trim() || 'ABUBAKAR JAMILU BELLO';
+      const examNo = document.getElementById('resExamNumberInput')?.value.trim();
+      const year = document.getElementById('resYearVal')?.value;
+
+      closeModal('examResultFlowModal');
+      showToast('Contacting Exam Portal & Retrieving Result Slip...');
+
+      setTimeout(() => {
+        playFintechSuccessSound();
+        document.getElementById('resExamBodyTitle').innerText = `${selectedResultBody} OFFICIAL RESULT SLIP`;
+        document.getElementById('resDisplayCandName').innerText = name.toUpperCase();
+        document.getElementById('resDisplayExamNo').innerText = examNo;
+        document.getElementById('resDisplayExamYear').innerText = `${year} (MAY/JUNE)`;
+        openModal('resultSlipModal');
+      }, 1500);
+    }
+
+    function toggleDownloadChoice() {
+      document.getElementById('receiptDownloadOptions')?.classList.toggle('hidden');
+    }
+
+    async function downloadReceiptAsPhoto() {
+      const el = document.getElementById('printableReceiptArea');
+      const actionRow = document.getElementById('receiptActionButtonsRow');
+      const optionsBox = document.getElementById('receiptDownloadOptions');
+      
+      if (actionRow) actionRow.style.display = 'none';
+      if (optionsBox) optionsBox.style.display = 'none';
+
+      const ref = document.getElementById('dRecRef')?.innerText || 'Receipt';
+      if (window.html2canvas && el) {
+        try {
+          const canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' });
+          const a = document.createElement('a');
+          a.download = `Receipt_${ref}.png`;
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          showToast('✓ Clean Receipt Photo saved directly to device!');
+        } catch(e) {
+          showToast('Error exporting photo receipt');
+        } finally {
+          if (actionRow) actionRow.style.display = '';
+          if (optionsBox) optionsBox.style.display = '';
+        }
+      }
+    }
+
+    async function downloadReceiptAsPDF() {
+      const el = document.getElementById('printableReceiptArea');
+      const actionRow = document.getElementById('receiptActionButtonsRow');
+      const optionsBox = document.getElementById('receiptDownloadOptions');
+      
+      if (actionRow) actionRow.style.display = 'none';
+      if (optionsBox) optionsBox.style.display = 'none';
+
+      const ref = document.getElementById('dRecRef')?.innerText || 'Receipt';
+      if (window.html2pdf && el) {
+        try {
+          await html2pdf().set({
+            margin: [4, 4, 4, 4],
+            filename: `Receipt_${ref}.pdf`,
+            html2canvas: { scale: 3, useCORS: true },
+            jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+          }).from(el).save();
+          showToast('✓ Clean Receipt PDF document downloaded!');
+        } catch(e) {
+          showToast('Error generating PDF document');
+        } finally {
+          if (actionRow) actionRow.style.display = '';
+          if (optionsBox) optionsBox.style.display = '';
+        }
+      }
+    }
+
+    function downloadResultSlipDirect(format) {
+      const el = document.getElementById('printableResultArea');
+      const buttonsRow = document.getElementById('resultSlipButtonsRow');
+      if (buttonsRow) buttonsRow.style.display = 'none';
+
+      const examNo = document.getElementById('resDisplayExamNo')?.innerText || 'Exam';
+      if (format === 'pdf' && window.html2pdf && el) {
+        html2pdf().set({
+          margin: [4, 4, 4, 4],
+          filename: `Result_Slip_${examNo}.pdf`,
+          html2canvas: { scale: 3, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+        }).from(el).save().then(() => {
+          if (buttonsRow) buttonsRow.style.display = '';
+          showToast('✓ Official Result Slip PDF Downloaded!');
+        });
+      } else if (format === 'photo' && window.html2canvas && el) {
+        html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+          const a = document.createElement('a');
+          a.download = `Result_Slip_${examNo}.png`;
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          if (buttonsRow) buttonsRow.style.display = '';
+          showToast('✓ Official Result Slip Photo saved!');
+        });
+      }
+    }
+
+    function downloadSlipDirect(format) {
+      const el = document.getElementById('printableIdSlipArea');
+      const buttonsRow = document.getElementById('slipButtonsRow');
+      if (buttonsRow) buttonsRow.style.display = 'none';
+
+      if (format === 'photo' && window.html2canvas && el) {
+        html2canvas(el, { scale: 3, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
+          const a = document.createElement('a');
+          a.download = `Identity_Slip_${flowState.target}.png`;
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          if (buttonsRow) buttonsRow.style.display = '';
+          showToast('✓ Clean Identity Slip saved as Photo!');
+        });
+      } else if (format === 'pdf' && window.html2pdf && el) {
+        html2pdf().set({
+          margin: [4, 4, 4, 4],
+          filename: `Identity_Slip_${flowState.target}.pdf`,
+          html2canvas: { scale: 3, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a5', orientation: 'portrait' }
+        }).from(el).save().then(() => {
+          if (buttonsRow) buttonsRow.style.display = '';
+          showToast('✓ Clean Identity Slip PDF downloaded!');
+        });
+      }
+    }
+
+    function shareSlipWhatsApp() {
+      const text = `*OFFICIAL IDENTITY SLIP VERIFICATION*\nHolder: ${customerFullName}\nNumber: ${flowState.target}\nStatus: VERIFIED BY NIMC/NIBSS ✓`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function shareDataReceiptNative() {
+      const ref = document.getElementById('dRecRef')?.innerText || '';
+      const amt = document.getElementById('dRecAmount')?.innerText || '';
+      const srv = document.getElementById('dRecPlan')?.innerText || '';
+      const phone = document.getElementById('dRecPhone')?.innerText || '';
+      const text = `*QUDSIYYASUB RECEIPT*\nStatus: SUCCESSFUL ✓\nPackage: ${srv}\nAmount: ${amt}\nTarget: ${phone}\nRef: ${ref}`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    function loginUser() {
+      const phoneInp = document.getElementById('loginPhoneInput')?.value.trim();
+      const remember = document.getElementById('rememberMeCheck')?.checked;
+      if (!phoneInp || phoneInp.length < 10) return showToast('⚠️ Enter valid phone number!');
+      
+      if (remember) {
+        localStorage.setItem('qudsiyyasub_remember_phone', phoneInp);
+      } else {
+        localStorage.removeItem('qudsiyyasub_remember_phone');
+      }
+      localStorage.setItem('qudsiyyasub_logged_in', 'true');
+      
+      const passInp = document.getElementById('loginPasswordInput');
+      if (passInp) passInp.value = '';
+
+      showAppScreen('screen-dashboard');
+      showToast(`Welcome back, ${customerFullName}!`);
+    }
+
+    function logoutUser() {
+      const confirmLogout = confirm("Are you sure you want to log out?");
+      if (confirmLogout) {
+        localStorage.setItem('qudsiyyasub_logged_in', 'false');
+        showToast('Signed out safely');
+        showAppScreen('screen-signin');
+      }
+    }
+
+    function toggleProfileSection(id) {
+      document.getElementById('profileInfoSection')?.classList.add('hidden');
+      document.getElementById('settingsSection')?.classList.add('hidden');
+      document.getElementById(id)?.classList.toggle('hidden');
+    }
+
+    function saveProfileInfo() {
+      customerFullName = document.getElementById('editUsernameInput')?.value.trim() || customerFullName;
+      localStorage.setItem('qudsiyyasub_customer_name', customerFullName);
+      document.querySelectorAll('.customer-full-name-display').forEach(el => el.innerText = customerFullName);
+      document.getElementById('profilePhoneDisplay').innerText = document.getElementById('editPhoneInput')?.value || '08012345678';
+      updateAvatarDisplay(customerPersonalAvatar);
+      showToast('✓ Profile updated successfully!');
+      toggleProfileSection('profileInfoSection');
+    }
+
+    function advancePinStep(step) {
+      if (step === 2) {
+        const old = document.getElementById('oldPinVal')?.value.trim();
+        if (!old || old.length !== 4) return showToast('⚠️ Enter current 4-digit PIN');
+        if (old !== customerPin) return showToast('❌ Current PIN is incorrect!');
+        showToast('✓ OTP sent to your registered phone number');
+        document.getElementById('pinStep1').classList.add('hidden');
+        document.getElementById('pinStep2').classList.remove('hidden');
+      } else if (step === 3) {
+        const otp = document.getElementById('pinOtpVal')?.value.trim();
+        if (!otp || otp.length < 4) return showToast('⚠️ Enter 6-digit OTP code');
+        showToast('✓ OTP verified!');
+        document.getElementById('pinStep2').classList.add('hidden');
+        document.getElementById('pinStep3').classList.remove('hidden');
+      }
+    }
+
+    function finalizeNewPin() {
+      const p1 = document.getElementById('newPin1')?.value.trim();
+      const p2 = document.getElementById('newPin2')?.value.trim();
+      if (!p1 || p1.length !== 4) return showToast('⚠️ New PIN must be 4 digits!');
+      if (p1 !== p2) return showToast('⚠️ New PINs do not match!');
+      customerPin = p1;
+      localStorage.setItem('qudsiyyasub_user_pin', customerPin);
+      closeModal('changePinFlowModal');
+      document.getElementById('oldPinVal').value = '';
+      document.getElementById('pinOtpVal').value = '';
+      document.getElementById('newPin1').value = '';
+      document.getElementById('newPin2').value = '';
+      showToast('✓ 4-Digit Security PIN changed successfully!');
+    }
+
+    function advancePassStep(step) {
+      if (step === 2) {
+        const oldP = document.getElementById('oldPassVal')?.value;
+        if (!oldP) return showToast('⚠️ Enter current password');
+        showToast('✓ OTP sent to registered contact');
+        document.getElementById('passStep1').classList.add('hidden');
+        document.getElementById('passStep2').classList.remove('hidden');
+      } else if (step === 3) {
+        const otp = document.getElementById('passOtpVal')?.value;
+        if (!otp || otp.length < 4) return showToast('⚠️ Enter 6-digit OTP code');
+        showToast('✓ OTP verified');
+        document.getElementById('passStep2').classList.add('hidden');
+        document.getElementById('passStep3').classList.remove('hidden');
+      }
+    }
+
+    function finalizeNewPass() {
+      const p = document.getElementById('newPass1')?.value;
+      if (!p || p.length < 8) return showToast('⚠️ Password must be at least 8 characters');
+      closeModal('changePasswordFlowModal');
+      document.getElementById('oldPassVal').value = '';
+      document.getElementById('passOtpVal').value = '';
+      document.getElementById('newPass1').value = '';
+      showToast('✓ Password updated successfully!');
+    }
+
+    function upgradeKycToLevel3() {
+      document.getElementById('kycLevelBadge').innerText = 'LEVEL 3 VERIFIED ✓';
+      document.getElementById('headerKycBadge').innerText = 'KYC LEVEL 3 VERIFIED ✓';
+      showToast('✓ Congratulations! BVN verified. Upgraded to Level 3!');
+    }
+
+    function openFullTransactionsModal() {
+      const container = document.getElementById('fullTxContainer');
+      const searchInp = document.getElementById('txSearchInput');
+      if (searchInp) searchInp.value = '';
+      filterFullTransactions('');
+      openModal('fullTxModal');
+    }
+
+    function filterFullTransactions(term) {
+      const container = document.getElementById('fullTxContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const filtered = transactionsHistory.filter(t => 
+        t.service.toLowerCase().includes(term.toLowerCase()) || 
+        t.target.includes(term) || 
+        t.id.toLowerCase().includes(term)
+      );
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-xs text-slate-400 font-bold">No transactions found.</div>`;
+        return;
+      }
+
+      filtered.forEach(tx => {
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center p-2.5 rounded-xl border bg-slate-50 dark:bg-[#00170c] cursor-pointer';
+        item.onclick = () => { closeModal('fullTxModal'); openSpecificReceipt(tx); };
+        item.innerHTML = `
+          <div><b class="text-xs text-slate-900 dark:text-white">${tx.service}</b><div class="text-[10px] text-slate-400 font-mono">${tx.id} • ${tx.target}</div></div>
+          <div class="text-xs font-black ${tx.status==='Credit'?'text-emerald-700':''}">${tx.status==='Credit'?'+':'-'}₦${tx.amount.toFixed(0)}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function showAppScreen(id) {
+      ['screen-splash','screen-onboard','screen-signin','screen-forgot','screen-signup','screen-otp','screen-dashboard'].forEach(s => {
+        document.getElementById(s)?.classList.add('hidden-screen');
+      });
+      document.getElementById(id)?.classList.remove('hidden-screen');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      safeCreateIcons();
+    }
+    function skipOnboarding() { showAppScreen('screen-signin'); }
+    function userContinueOnboarding() { showAppScreen('screen-signin'); }
+    function goToSignUp() { showAppScreen('screen-signup'); }
+    function goToSignIn() { showAppScreen('screen-signin'); }
+
+    function validatePasswordStrength(pass) {
+      const len = pass.length >= 8, up = /[A-Z]/.test(pass), low = /[a-z]/.test(pass), num = /[0-9]/.test(pass), sym = /[^A-Za-z0-9]/.test(pass);
+      const setR = (id, ok) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = ok ? 'text-emerald-700 font-bold flex items-center gap-1.5' : 'text-slate-400 font-bold flex items-center gap-1.5';
+        el.children[0].innerText = ok ? '✓' : '✕';
+      };
+      setR('rule-len', len); setR('rule-upper', up); setR('rule-lower', low); setR('rule-num', num); setR('rule-sym', sym);
+      checkPasswordMatch();
+    }
+
+    function checkPasswordMatch() {
+      const p1 = document.getElementById('regPasswordInput')?.value;
+      const p2 = document.getElementById('regConfirmPasswordInput')?.value;
+      const ind = document.getElementById('matchIndicator');
+      if (!ind || !p2) { ind?.classList.add('hidden'); return; }
+      ind.classList.remove('hidden');
+      if (p1 === p2) { ind.className = 'text-[10px] font-extrabold text-emerald-700 mt-0.5'; ind.innerText = '✓ Passwords Match'; }
+      else { ind.className = 'text-[10px] font-extrabold text-rose-600 mt-0.5'; ind.innerText = '✕ Passwords Do Not Match'; }
+    }
+
+    function handleRegistrationSubmit() {
+      const name = document.getElementById('regFullName')?.value.trim();
+      const phone = document.getElementById('regPhone')?.value.trim() || '08012345678';
+      const pin = document.getElementById('regPinInput')?.value.trim();
+
+      if (!name || phone.length < 10) return showToast('⚠️ Enter full name and valid phone number!');
+      if (!pin || pin.length !== 4) return showToast('⚠️ Please set a 4-digit security PIN!');
+
+      customerFullName = name;
+      customerPin = pin;
+      localStorage.setItem('qudsiyyasub_customer_name', customerFullName);
+      localStorage.setItem('qudsiyyasub_user_pin', customerPin);
+
+      updateAvatarDisplay(customerPersonalAvatar);
+      document.querySelectorAll('.customer-full-name-display').forEach(el => el.innerText = customerFullName);
+
+      document.getElementById('otpTargetPhone').innerText = phone;
+      showAppScreen('screen-otp');
+    }
+
+    function verifyOtpAndProceed() {
+      const otp = document.getElementById('otpCodeInput')?.value.trim();
+      if (!otp || otp.length < 4) return showToast('⚠️ Enter 6-digit OTP code');
+      localStorage.setItem('qudsiyyasub_logged_in', 'true');
+      showToast('✓ Account Verified Successfully!');
+      setTimeout(() => showAppScreen('screen-dashboard'), 350);
+    }
+
+    function submitForgotPassword() {
+      const p = document.getElementById('forgotPhoneInput')?.value.trim();
+      if (!p || p.length < 10) return showToast('⚠️ Enter registered phone number');
+      document.getElementById('otpTargetPhone').innerText = p;
+      showToast('✓ Password Recovery OTP sent to your phone');
+      showAppScreen('screen-otp');
+    }
+
+    function openModal(id) { document.getElementById(id)?.classList.remove('hidden'); safeCreateIcons(); }
+    function closeModal(id) { document.getElementById(id)?.classList.add('hidden'); }
+    function openProfileModal() { openModal('profileModal'); }
+    function openFundWalletModal() { openModal('fundWalletModal'); }
+    
+    function toggleDrawer() {
+      const d = document.getElementById('masterDrawer');
+      if (d) {
+        d.classList.toggle('hidden');
+        safeCreateIcons();
+      }
+    }
+
+    function toggleSpeedDial() {
+      const sd = document.getElementById('supportSpeedDial');
+      if (sd) sd.classList.toggle('hidden');
+    }
+    
+    function toggleThemeMode() { document.documentElement.classList.toggle('dark'); }
+    
+    function toggleBalance() {
+      const b = document.getElementById('balanceDisplay');
+      const icon = document.getElementById('eyeIcon');
+      if (b) {
+        if (b.innerText === '••••••••') {
+          b.innerText = `₦${currentBalance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+          if (icon) icon.setAttribute('data-lucide', 'eye');
+        } else {
+          b.innerText = '••••••••';
+          if (icon) icon.setAttribute('data-lucide', 'eye-off');
+        }
+        safeCreateIcons();
+      }
+    }
+    
+    function copyToClipboard(txt, label) { if (navigator.clipboard) navigator.clipboard.writeText(txt); showToast('Copied ' + label); }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      if (t) { t.innerText = msg; t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 2400); }
+    }
+    function switchBank(k) {
+      document.getElementById('accNumber').innerText = k === 'opay' ? '9012345678' : '8098765432';
+      document.getElementById('accBankName').innerText = k === 'opay' ? 'OPAY' : 'MONIEPOINT';
+      document.getElementById('btn-opay').className = k === 'opay' ? 'px-2 py-0.5 rounded-md bg-[#006B3C] text-white' : 'px-2 py-0.5 rounded-md bg-slate-100 dark:bg-emerald-950 text-slate-600 dark:text-slate-300';
+      document.getElementById('btn-moniepoint').className = k === 'moniepoint' ? 'px-2 py-0.5 rounded-md bg-[#006B3C] text-white' : 'px-2 py-0.5 rounded-md bg-slate-100 dark:bg-emerald-950 text-slate-600 dark:text-slate-300';
+    }
+    
+    async function triggerNativeContactPick() {
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['tel', 'name'];
+          const opts = { multiple: false };
+          const contacts = await navigator.contacts.select(props, opts);
+          if (contacts && contacts[0] && contacts[0].tel && contacts[0].tel.length > 0) {
+            let phone = contacts[0].tel[0].replace(/[^0-9]/g, '');
+            if (phone.startsWith('234')) phone = '0' + phone.substring(3);
+            const inEl = document.getElementById('uServiceInput');
+            if (inEl) {
+              inEl.value = phone.slice(0, 11);
+              handleUniversalInput(inEl.value);
+            }
+            showToast('✓ Contact Selected');
+            return;
+          }
+        } catch (e) {}
+      }
+      showToast('Phonebook: Enter recipient number');
+    }
+
+    function togglePassVisibility(id) {
+      const el = document.getElementById(id);
+      if (el) el.type = el.type === 'password' ? 'text' : 'password';
+    }
+
+    // DRAGGABLE CUSTOMER CARE
+    (function initDrag() {
+      const wrap = document.getElementById('draggableSupportWrap');
+      const btn = document.getElementById('supportMainButton');
+      if (!wrap || !btn) return;
+      let drag = false, sx, sy, ox, oy, moved = false;
+      function s(e) { drag = true; moved = false; const t = e.touches ? e.touches[0] : e; sx = t.clientX; sy = t.clientY; const r = wrap.getBoundingClientRect(); ox = r.left; oy = r.top; }
+      function m(e) {
+        if (!drag) return; const t = e.touches ? e.touches[0] : e;
+        const dx = t.clientX - sx, dy = t.clientY - sy;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) moved = true;
+        wrap.style.left = Math.max(10, Math.min(window.innerWidth - 65, ox + dx)) + 'px';
+        wrap.style.top = Math.max(10, Math.min(window.innerHeight - 65, oy + dy)) + 'px';
+        wrap.style.right = 'auto'; wrap.style.bottom = 'auto';
+      }
+      btn.addEventListener('touchstart', s, { passive: true });
+      window.addEventListener('touchmove', m, { passive: true });
+      window.addEventListener('touchend', () => drag = false);
+      btn.addEventListener('mousedown', s);
+      window.addEventListener('mousemove', m);
+      window.addEventListener('mouseup', () => drag = false);
+      btn.addEventListener('click', e => { 
+        if (moved) { e.preventDefault(); return; } 
+        toggleSpeedDial();
+      });
+    })();
+
+    // SPLASH SCREEN & AUTH LOGIC
+    function dismissSplashScreen() {
+      const splash = document.getElementById('screen-splash');
+      if (splash) { splash.style.display = 'none'; splash.classList.add('hidden-screen'); }
+      
+      const isLoggedIn = localStorage.getItem('qudsiyyasub_logged_in') === 'true';
+      if (isLoggedIn) {
+        showAppScreen('screen-dashboard');
+      } else {
+        showAppScreen('screen-signin');
+      }
+      safeCreateIcons();
+    }
+
+    function startSplashEngine() {
+      let progress = 0;
+      const bar = document.getElementById('splashProgress');
+      const text = document.getElementById('splashPercent');
+      const timer = setInterval(() => {
+        progress += 2;
+        if (bar) bar.style.width = progress + '%';
+        if (text) {
+          if (progress < 40) text.textContent = `Connecting to API servers... ${progress}%`;
+          else if (progress < 75) text.textContent = `Verifying 256-Bit SSL connection... ${progress}%`;
+          else text.textContent = `Synchronizing wallet data... ${progress}%`;
+        }
+        if (progress >= 100) {
+          clearInterval(timer);
+          dismissSplashScreen();
+        }
+      }, 40);
+    }
+    startSplashEngine();
+  </script>
+</body>
+</html>
+
+
